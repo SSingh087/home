@@ -18,13 +18,11 @@ powerButton.addEventListener("click", () => {
     timers.splice(0);
     turnedoff(["Loading ..."]);
 
-    //var spinnerShowTime = 3000
     document.getElementById('boom').style.display = "";
-    //document.getElementById('chart').src = 'boom.gif';
-    //setTimeout("hideSpinner()", spinnerShowTime);
-
-    //location.replace("https")
-    
+    setTimeout(myURL, 5000);
+         function myURL(){
+            window.location.replace('homepage.html');
+         }
   }
 });
 
