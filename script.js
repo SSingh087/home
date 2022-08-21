@@ -10,8 +10,8 @@ powerButton.addEventListener("click", () => {
   if (powerLed.classList.contains("on")) {
     timers.splice(0);
     screen.classList.remove("off");
-    startTyping(["नमस्ते, Hello, Bonjour 👋","Welcome to my website",
-      "I do astrophysics","Turn off the screen to look beyond .... 🚀"]);
+    startTyping(["Hello", "Welcome to my website",
+      "Turn off the screen to look beyond ...."]);
   } else {
     screen.innerHTML = "";
     timers.forEach(timer => clearTimeout(timer));
@@ -49,8 +49,6 @@ const turnedoff = texts => {
   const timer = setTimeout(() => wait);
   timers.push(timer);
 };
-
-
 
 const startTyping = texts => {
   let wait = 50;
