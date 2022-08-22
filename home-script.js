@@ -1,12 +1,12 @@
 // set up text to print, each item in array is new line
 var aText = new Array(
 "Hello people !!", 
-// "I have been working in Gravitaitonal physics.",
-// "I am a 2nd year master student at Observatoire de Paris-PSL.",
-// "I did my 1st year master from Université Pierre et Marie Curie - Sorbonne Université",
-// "Pull the tug to begin journey ..",
-// "or as the God said",
-// "Let there be light ....."
+"I have been working in Gravitaitonal physics.",
+"I am a 2nd year master student at Observatoire de Paris-PSL.",
+"I did my 1st year master from Université Pierre et Marie Curie - Sorbonne Université",
+"Pull the tug to begin journey ..",
+"or as the God said",
+"Let there be light ....."
 );
 var iSpeed = 50; // time delay of print out
 var iIndex = 0; // start printing array at this posision
@@ -37,7 +37,6 @@ function typewriter()
  } else {
   setTimeout("typewriter()", iSpeed);
  }
- document.getElementById("bulb").style.display = "block";
 }
 
 typewriter();

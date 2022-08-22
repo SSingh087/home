@@ -84,7 +84,7 @@ body {
           width: 100%;
           max-width: calc(var(--width-monitor) * 0.72);
           /*font-family: "EnterCommand";*/
-          font-size: 30px;*/
+          font-size: 30px;
           color: #00FF00;
           padding: 10px 20px;
           box-sizing: border-box;
