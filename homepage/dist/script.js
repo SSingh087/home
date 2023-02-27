@@ -105,12 +105,33 @@ class App extends React.Component {
     this.handleToggleDebug = this.handleToggleDebug.bind(this);
     this.handleButtonClicked = this.handleButtonClicked.bind(this);
     this.handleCursorGrabbed = this.handleCursorGrabbed.bind(this);
+    this.timeline = this.timeline.bind(this);
     this.research = this.research.bind(this);
+    this.code = this.code.bind(this);
+    this.resume = this.resume.bind(this);
+    this.contact = this.contact.bind(this);
+  }
+
+  timeline() {
+    location.href = "./timeline.html";
   }
 
   research() {
-    location.href = "https://github.com/SSingh087/sha98";
+    location.href = "./research.html";
   }
+
+  code() {
+    location.href = "https://github.com/SSingh087";
+  }
+
+  resume() {
+    location.href = "./CV.pdf";
+  }
+
+  contact() {
+    location.href = "./contact.html";
+  }
+
 
   handleToggleDebug() {
     this.setState({
@@ -154,20 +175,24 @@ class App extends React.Component {
       React.createElement("p", null, "Do you want to know what's inside a Blackhole? Peek in now ... "), /*#__PURE__*/
     
       React.createElement("button", {
+        className: "timeline",
+        onClick: this.timeline }, "Timeline"),
+
+      React.createElement("button", {
         className: "research",
         onClick: this.research }, "Research"),
 
       React.createElement("button", {
         className: "coding",
-        onClick: this.research }, "Codes"),
+        onClick: this.code }, "Codes"),
 
       React.createElement("button", {
         className: "resume",
-        onClick: this.research }, "Resume"),
+        onClick: this.resume }, "Resume"),
 
       React.createElement("button", {
         className: "contact",
-        onClick: this.research }, "Contact"),
+        onClick: this.contact }, "Contact"),
 
       React.createElement("button", {
         className: "debug-button",

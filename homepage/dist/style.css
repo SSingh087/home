@@ -1,6 +1,7 @@
 html {
   font-size: 18px;
 }
+
 @media (min-width: 900px) {
   html {
     font-size: 24px;
@@ -266,10 +267,26 @@ a {
   opacity: 0.0;
 }
 
+.timeline {
+  position: absolute;
+  bottom: 80px;
+  left: 5%;
+  text-align: center;
+  min-width: 100px;
+  background: #519e96;
+  color: white;
+  border-radius: 5px;
+  padding: 0.4rem 0.5rem;
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
 .research {
   position: absolute;
   bottom: 80px;
-  left: 10%;
+  left: 20%;
   min-width: 125px;
   background: #519e96;
   color: white;
@@ -285,7 +302,7 @@ a {
 .coding {
   position: absolute;
   bottom: 80px;
-  left: 25%;
+  left: 35%;
   text-align: center;
   min-width: 100px;
   background: #519e96;
@@ -301,7 +318,7 @@ a {
 .resume {
   position: absolute;
   bottom: 80px;
-  left: 38%;
+  left: 48%;
   text-align: center;
   min-width: 100px;
   background: #519e96;
@@ -317,7 +334,7 @@ a {
 .contact {
   position: absolute;
   bottom: 80px;
-  left: 52%;
+  left: 62%;
   text-align: center;
   min-width: 100px;
   background: #519e96;
@@ -329,6 +346,7 @@ a {
   letter-spacing: 1px;
   text-transform: uppercase;
 }
+
 
 @-webkit-keyframes shaka {
   0% {
