@@ -1,3 +1,13 @@
+const greetings = [
+  { lang: "hi", text: "नमस्ते" },
+  { lang: "en", text: "Hello" },
+  { lang: "fr", text: "Bonjour" },
+  { lang: "es", text: "Hola" },
+  { lang: "de", text: "Guten Tag" },
+  // Add more greetings in different languages
+];
+
+
 const { useState, useRef, useEffect, useLayoutEffect, createContext } = React;
 
 /**
@@ -170,9 +180,10 @@ class App extends React.Component {
     return /*#__PURE__*/(
       React.createElement("div", { className: appClass, style: screenStyle }, /*#__PURE__*/
       React.createElement("section", { className: "container" }, /*#__PURE__*/
-      React.createElement("h1", null, "Salut!"), /*#__PURE__*/
-      React.createElement("p", null, "I am Astrophysicist-to-be. Currently a 2nd year master student at l’Observatoire de Paris - PSL. I work in Gravitational Waves."),
-      React.createElement("p", null, "Do you want to know what's inside a Blackhole? Peek in now ... "), /*#__PURE__*/
+      React.createElement("h1", null, "नमस्ते !"), /*#__PURE__*/
+      React.createElement("p", null, "I am Shashwat Singh, PhD at University of Glasgow \
+        in Dept. of Physics and Astronomy under supervision of Dr. Chritopher Berry and Dr. John Veitch. \
+        My research focusses on Gravitational Waves."),
     
       React.createElement("button", {
         className: "timeline",
@@ -302,3 +313,13 @@ const Grabber = ({ state, gameOver, extended, onCursorGrabbed }) => {
 // Render app
 ReactDOM.render( /*#__PURE__*/React.createElement(App, null), document.getElementById("app"));
 
+var img = document.createElement('img');
+
+// Set the source and alt attributes of the image
+img.src = 'ReadyPlayerMe-Avatar.png';
+
+// Find the container element where you want to append the image
+var container = document.getElementById('imageContainer');
+
+// Append the image to the container
+container.appendChild(img);
