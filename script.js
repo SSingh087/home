@@ -11,15 +11,15 @@ powerButton.addEventListener("click", () => {
     timers.splice(0);
     screen.classList.remove("off");
     startTyping(["Hello", "Welcome to my website",
-      "Turn off the screen to look beyond ...."]);
+      "Turn off the screen ...."]);
   } else {
     screen.innerHTML = "";
     timers.forEach(timer => clearTimeout(timer));
     timers.splice(0);
-    turnedoff(["Loading ..."]);
+    //turnedoff(["Loading ..."]);
 
     //document.getElementById('boom').style.display = "";
-    setTimeout(myURL, 2000);
+    setTimeout(myURL);
          function myURL(){
             window.location.replace('./homepage/dist/index.html');
          }
@@ -27,31 +27,8 @@ powerButton.addEventListener("click", () => {
 });
 
 
-const turnedoff = texts => {
-  let wait = 50;
-  texts.forEach(text => {
-    wait += 750;
-    for (let i = 0; i < text.length; i++) {
-      const timer = setTimeout(() => {
-        screen.innerHTML += text[i];
-      }, wait);
-      timers.push(timer);
-      wait += 50 + ~~(Math.random() * 50);
-    }
-
-    wait += 750;
-
-    const timer = setTimeout(() => screen.innerHTML += "<br>", wait);
-    timers.push(timer);
-  });
-
-  wait += 500;
-  const timer = setTimeout(() => wait);
-  timers.push(timer);
-};
-
 const startTyping = texts => {
-  let wait = 50;
+  let wait = 10;
 
   screen.innerHTML = "$ ";
   texts.forEach(text => {
