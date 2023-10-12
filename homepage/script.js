@@ -117,9 +117,8 @@ class App extends React.Component {
     this.handleCursorGrabbed = this.handleCursorGrabbed.bind(this);
     this.timeline = this.timeline.bind(this);
     this.research = this.research.bind(this);
-    this.code = this.code.bind(this);
     this.resume = this.resume.bind(this);
-    this.contact = this.contact.bind(this);
+    this.nonac = this.nonac.bind(this);
   }
 
   timeline() {
@@ -127,19 +126,15 @@ class App extends React.Component {
   }
 
   research() {
-    location.href = "./research.html";
-  }
-
-  code() {
-    location.href = "https://github.com/SSingh087";
+    location.href = "./research/index.html";
   }
 
   resume() {
     location.href = "./CV.pdf";
   }
 
-  contact() {
-    location.href = "./contact.html";
+  nonac() {
+    location.href = "./nonac/index.html";
   }
 
 
@@ -181,9 +176,9 @@ class App extends React.Component {
       React.createElement("div", { className: appClass, style: screenStyle }, /*#__PURE__*/
       React.createElement("section", { className: "container" }, /*#__PURE__*/
       React.createElement("h1", null, "नमस्ते !"), /*#__PURE__*/
-      React.createElement("p", null, "I am Shashwat Singh, Ph.D. at ", React.createElement("a", { href: "https://www.gla.ac.uk/" }, "University of Glasgow"), " in ", React.createElement("a", { href: "https://www.gla.ac.uk/schools/physics/" }, "School of Physics and Astronomy"), ". I am a member of the ", React.createElement("a", {href:"https://www.gla.ac.uk/schools/physics/research/groups/igr/"}, "IGR"), " group, where we are unveiling cosmic mysteries using ", React.createElement("a", { href: "https://your-link-here.com" }, "Gravitational Waves"), ", which is the primary area of my research. I work under the supervision of ", React.createElement("a", { href: "https://cplberry.com/" }, "Dr. Chritopher Berry"), " and ", React.createElement("a", { href: "https://www.physics.gla.ac.uk/igr/index.php?L1=members&L2=member&name=jveitch"}, "Dr. John Veitch"), " focusing on revealing the family of massive black holes with LISA. Feel free to explore my ", React.createElement("a", { href: "./research.html"}, "research")," and ", React.createElement("a", { href: "./contact.html"}, "nudge me"), " in any case."),
+      React.createElement("p", null, "I am ", React.createElement("a", { href:"mailto:s.singh.3@research.gla.ac.uk?subject=Hi !!"}, "Shashwat Singh"), " Ph.D. at ", React.createElement("a", { href: "https://www.gla.ac.uk/" }, "University of Glasgow"), " in ", React.createElement("a", { href: "https://www.gla.ac.uk/schools/physics/" }, "School of Physics and Astronomy"), ". I am a member of the ", React.createElement("a", {href:"https://www.gla.ac.uk/schools/physics/research/groups/igr/"}, "IGR"), " group, where we are unveiling cosmic mysteries using ", React.createElement("a", { href: "https://your-link-here.com" }, "Gravitational Waves"), ", which is the primary area of my research. I work under the supervision of ", React.createElement("a", { href: "https://cplberry.com/" }, "Dr. Chritopher Berry"), " and ", React.createElement("a", { href: "https://www.physics.gla.ac.uk/igr/index.php?L1=members&L2=member&name=jveitch"}, "Dr. John Veitch"), " focusing on revealing the family of massive black holes with LISA. Feel free to explore my ", React.createElement("a", { href: "./research.html"}, "research")," and ", React.createElement("a", { href: "mailto:s.singh.3@research.gla.ac.uk?subject=Inquiry on research"}, "nudge me"), " in any case."),
 
-      React.createElement("p", null, "Beyond the academic realm, I co-founded ", React.createElement("a", { href: "https://www.bosex.org/"}, "Bose.X"), ", a research group dedicated to supporting and promoting undergraduate research. Recently I started a blog/educational channel - \"Gra-Witty\" where I aim to share latest updates on astrophysics and explain academic articles. If you would like to contribute to this endeavor feel free to ", React.createElement("a", { href: "./contact.html"}, "contact"),  " me."),
+      React.createElement("p", null, "Beyond the academic realm, I co-founded ", React.createElement("a", { href: "https://www.bosex.org/"}, "Bose.X"), ", a research group dedicated to supporting and promoting undergraduate research. Recently I started a blog/educational channel - \"Gra-Witty\" where I aim to share latest updates on astrophysics and explain academic articles. If you would like to contribute to this endeavor feel free to ", React.createElement("a", { href: ".mailto:s.singh.3@research.gla.ac.uk?subject=Inquiry on Grawitty"}, "contact"),  " me."),
 
       React.createElement("p", null, "Check out my drawer where I keep my social connections  .... "),
 
@@ -197,16 +192,12 @@ class App extends React.Component {
         onClick: this.research }, "Research"),
 
       React.createElement("button", {
-        className: "coding",
-        onClick: this.code }, "Codes"),
-
-      React.createElement("button", {
         className: "resume",
         onClick: this.resume }, "Resume"),
 
       React.createElement("button", {
-        className: "contact",
-        onClick: this.contact }, "Contact"),
+        className: "nonac",
+        onClick: this.nonac }, "Outside academia"),
 
       React.createElement("button", {
         className: "debug-button",
@@ -216,8 +207,8 @@ class App extends React.Component {
         className: "trap-button",
         onClick: this.handleButtonClicked },	
       gameOver && "new physics unlocked", 
-      cursorGrabbed && "Lost in BH !",
-      !gameOver && !cursorGrabbed && "Peek in a BH !"), /*#__PURE__*/
+      cursorGrabbed && "Information lost",
+      !gameOver && !cursorGrabbed && "Peek in blackhole"), /*#__PURE__*/
 
       React.createElement("div", { className: "grab-zone-wrapper" }, /*#__PURE__*/
       React.createElement(GrabZone, {

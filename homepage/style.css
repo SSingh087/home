@@ -271,7 +271,7 @@ a {
 .timeline {
   position: absolute;
   top: 10%;
-  left: 10%;
+  left: 11%;
   text-align: center;
   min-width: 125px;
   background: #519e96;
@@ -287,7 +287,7 @@ a {
 .research {
   position: absolute;
   top: 25%;
-  left: 10%;
+  left: 11%;
   min-width: 125px;
   background: #519e96;
   color: white;
@@ -300,26 +300,10 @@ a {
 }
 
 
-.coding {
-  position: absolute;
-  top: 40%;
-  left: 10%;
-  text-align: center;
-  min-width: 100px;
-  background: #519e96;
-  color: white;
-  border-radius: 5px;
-  padding: 0.4rem 0.5rem;
-  font-weight: 600;
-  font-size: 26px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
 .resume {
   position: absolute;
-  top: 55%;
-  left: 10%;
+  top: 40%;
+  left: 12%;
   text-align: center;
   min-width: 100px;
   background: #519e96;
@@ -332,10 +316,10 @@ a {
   text-transform: uppercase;
 }
 
-.contact {
+.nonac {
   position: absolute;
-  top: 70%;
-  left: 10%;
+  top: 55%;
+  left: 8%;
   text-align: center;
   min-width: 100px;
   background: #519e96;
@@ -371,8 +355,8 @@ a {
   width: 180px;
   height: 60px;
   position: absolute;
-  bottom: 10%;
-  right: 10%;
+  top: 73%;
+  left: 15.5%;
   transform: translate(-50%, -50%);
   cursor: pointer;
   z-index: 5; /* Adjust the value as needed to make sure it's above other elements */
@@ -434,9 +418,13 @@ a {
 .ball.github {
   background-image: radial-gradient(circle at 50% 120%, #312121, #151213 80%, #000000 100%);
 }
-.ball.website {
-  background-image: radial-gradient(circle at 50% 120%, #fb486a, #d40028 80%, #b70728 100%);
+.ball.linkedin {
+  background-image: radial-gradient(circle at 50% 120%, #0076b2, #151213 80%, #0076b2 100%);
 }
+.ball.mail {
+  background-image: radial-gradient(circle at 50% 120%, #0076b2, #151213 80%, #151213 100%);
+}
+
 .ball svg {
   position: absolute;
   top: 50%;
@@ -521,6 +509,13 @@ a {
   -moz-transform: translate3d(50px, -50px, 0);
   -o-transform: translate3d(50px, -50px, 0);
   transform: translate3d(50px, -50px, 0);
+}
+
+.drawer:hover .ball-4 {
+  -webkit-transform: translate3d(-10px, -80px, 0);
+  -moz-transform: translate3d(-10px, -80px, 0);
+  -o-transform: translate3d(-10px, -80px, 0);
+  transform: translate3d(-10px, -80px, 0);
 }
 .drawer:hover .cover {
   -webkit-transform: translate3d(20px, 30px, 250px);
