@@ -1,22 +1,107 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Shashwat - Research</title>
+  <title>Shashwat - Non academia</title>
   <link href="https://fonts.googleapis.com/css?family=Montserrat:200,700&display=swap" rel="stylesheet">
   <link rel='stylesheet' href='https://unpkg.com/backpack.css'>
   <link rel="stylesheet" href="./style.css">
-
+  <style>
+    .expanding-div {
+      display: none;
+      height: 100px; /* Set your desired fixed height */
+      overflow: hidden;
+      font-size: 30px;
+      text-transform: capitalize;
+      color: #fff;
+      font-family: monospace;
+      background-color: rgba(20, 10, 30, 1);
+    }
+  </style>
 </head>
 <body>
-<!-- partial:index.partial.html -->
 <div class="ag-timeline-block">
   <div class="ag-timeline_title-box">
     <div class="ag-timeline_tagline">Research</div>
   </div>
-</div>  
-<!-- partial -->
- <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script><script  src="./script.js"></script>
+</div>
+<!-- partial:index.partial.html -->
+<section class="hero-section">
+  <div class="card-grid">
+    <a class="card" href="#thesis">
+      <div class="card__background" style="background-image: url('hoop.png');"></div>
+      <div class="card__content">
+        <p class="card__category"> </p>
+        <h3 class="card__heading">Population Inference</h3>
+      </div>
+    </a>
 
+    <a class="card" href="#lens">
+      <div class="card__background" style="background-image: url('hoop.png');"></div>
+      <div class="card__content">
+        <p class="card__category"> </p>
+        <h3 class="card__heading">GW lensing</h3>
+      </div>
+    </a>
+
+    <a class="card" href="#hom">
+      <div class="card__background" style="background-image:url('hoop.png');"></div>
+      <div class="card__content">
+        <p class="card__category"> </p>
+        <h3 class="card__heading">GWs & Higher modes</h3>
+      </div>
+    </a>
+
+    <a class="card" href="#wfm">
+      <div class="card__background" style="background-image: url('hoop.png');"></div>
+      <div class="card__content">
+        <p class="card__category"> </p>
+        <h3 class="card__heading">GW waveform compression</h3>
+      </div>
+    </a>
+
+    <a class="card" href="#ml">
+      <div class="card__background" style="background-image: url('hoop.png');"></div>
+      <div class="card__content">
+        <p class="card__category"> </p>
+        <h3 class="card__heading">Machine Learning</h3>
+      </div>
+    </a>
+
+  </div>
+
+    <div class="expanding-div thesis">This is the tile for my current ongoing project</div>
+    <div class="expanding-div lens">LENS.</div>
+    <div class="expanding-div hom">hom</div>
+    <div class="expanding-div wfm">wfm</div>
+    <div class="expanding-div ml">ml</div>
+
+</section>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const links = document.querySelectorAll("a[href^='#']");
+    const expandingDivs = document.querySelectorAll(".expanding-div");
+    
+    links.forEach((link, index) => {
+      link.addEventListener("click", function (event) {
+        event.preventDefault(); // Prevent the link from navigating
+        
+        expandingDivs.forEach((div, i) => {
+          if (index === i) {
+            if (div.style.display === "none" || div.style.display === "") {
+              div.style.display = "block";
+            } else {
+              div.style.display = "none";
+            }
+          } else {
+            div.style.display = "none";
+          }
+        });
+      });
+    });
+  });
+</script>
 </body>
 </html>
+
