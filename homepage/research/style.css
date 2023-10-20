@@ -26,8 +26,6 @@ body{
   height: 100%;
   font-family: monospace;
   overflow-x: hidden;
-  font-weight: 600;
-  text-transform: uppercase;  
 }
 
 .hero-section{
@@ -113,10 +111,11 @@ body{
 
 .card__heading{
   color: var(--text-lighter);
-  font-size: 1.9rem;
+  font-size: 2.0rem;
   text-shadow: 2px 2px 20px rgba(0,0,0,0.2);
   line-height: 1.4;
   word-spacing: 100vw;
+  font-weight: 600;
   text-transform: uppercase;
 }
 
@@ -130,6 +129,8 @@ body{
   padding: 0 0 50px;
   background-color: rgba(20, 10, 30, 1);
   text-align: center;
+  text-transform: uppercase;  
+  font-weight: 600;
 }
 .ag-timeline_tagline {
   font-size: 60px;
@@ -138,10 +139,10 @@ body{
 
 .expanding-div {
   position: absolute;
-  bottom:20%;
+  bottom:5%;
   left:10%;
   display: none;
-  height: 100px; /* Adjust the height as needed */
+  width: 1500px; /* Adjust the height as needed */
   overflow: hidden;
   font-size: 30px;
   color: #fff;
