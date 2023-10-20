@@ -4,7 +4,7 @@ body {
   }
 
 .ag-format-container {
-  width: 1160px;
+  width: 100%;
   margin: 0 auto;
   position: relative;
 }
@@ -19,13 +19,13 @@ body {
   font-weight: 600;
 }
 .ag-timeline_tagline {
-  font-size: 60px;
+  font-size: 3vw;
   color: #fff;
 }
 
 .main {
   padding: 0 12%;
-  font-size: 28px;
+  font-size: 1.5vw;
   color: #fff;
   text-align: justify;  
 }
@@ -43,7 +43,7 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
 
 .h2 {
   padding: 0 12%;
-  font-size: 28px;
+  font-size: 1vw;
   font-color: #fff;
   text-align: justify;
 }
@@ -62,7 +62,7 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
   margin: 10px;
   width: 50px;
   height: 50px;
-  font-size: 18px;
+  font-size: 2vw;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -75,7 +75,7 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
 .wrapper .tooltip {
   position: absolute;
   top: 0;
-  font-size: 14px;
+  font-size: 2vw;
   background: #ffffff;
   color: #ffffff;
   padding: 5px 8px;
