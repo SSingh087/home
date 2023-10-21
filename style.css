@@ -19,8 +19,6 @@ canvas {
   filter: blur(0px);
 }
 
-/* DEMO-SPECIFIC STYLES */
-
 .hidden {
   display: none;
 }
@@ -42,9 +40,9 @@ canvas {
   overflow: hidden;
   white-space: nowrap;
   width: 0;
-  animation: typing 1.2s steps(20, end) 0s forwards,
+  animation: typing 1s steps(20, end) 0s forwards,
              cursorVisibility 0.5s step-end 4s forwards,
-             backspace 1s steps(20, end) 1.5s forwards,
+             backspace 0.5s steps(20, end) 1.5s forwards,
              cursorVisibility 0.5s step-end 3.5s forwards;
 }
 
@@ -54,35 +52,13 @@ canvas {
   overflow: hidden;
   white-space: nowrap;
   width: 0;
-  animation: typing 1.2s steps(20, end) 3.5s forwards,
+  animation: typing 1.2s steps(20, end) 3s forwards,
              cursorVisibility 0.5s step-end 6.5s forwards,
              backspace 1s steps(20, end) 5s forwards,
-             cursorVisibility 0.5s step-end 8s forwards;
-}
-
-/* The typing and backspace animation for the third text */
-.typewriter h1:nth-child(3) {
-  display: inline-block;
-  overflow: hidden;
-  white-space: nowrap;
-  width: 0;
-  animation: typing 2s steps(20, end) 6s forwards,
-             cursorVisibility 0.5s step-end 11s forwards,
-             backspace 1s steps(20, end) 6.5s forwards,
-             cursorVisibility 0.5s step-end 12.5s forwards;
+             cursorVisibility 0.5s step-end 12s forwards;
 }
 
 /* The typing and backspace animation for the last text */
-.typewriter h1:nth-child(4) {
-  display: inline-block;
-  overflow: hidden;
-  white-space: nowrap;
-  width: 0;
-  animation: typing 1.2s steps(20, end) 8s forwards,
-             cursorVisibility 0.5s step-end 11.5s forwards,
-             backspace 1s steps(20, end) 11.5s forwards,
-             cursorVisibility 0.5s step-end 17s forwards;
-}
 
 /* Keyframes for the typing and backspace animations */
 @keyframes typing {
@@ -99,7 +75,7 @@ canvas {
 
 @keyframes backspace {
   0% {
-    width: 50%;
+    width: 80%;
   }
   50% {
     width: 50%;
