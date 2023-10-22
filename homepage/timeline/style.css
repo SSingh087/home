@@ -1,8 +1,6 @@
 body {
   background-color: rgba(20, 10, 30, 1);
   overflow-x: hidden;
-  text-transform: uppercase;
-  font-weight: 600
 }
 
 @font-face {
@@ -14,7 +12,7 @@ body {
   url(https://raw.githubusercontent.com/SochavaAG/example-mycode/master/pens/timeline/fonts/legend/ESLLegend-Light.ttf) format("truetype"),
   url(https://raw.githubusercontent.com/SochavaAG/example-mycode/master/pens/timeline/fonts/legend/ESLLegend-Light.svg#eicon) format("svg");
   font-style: normal;
-  font-weight: 300;
+  font-weight: 200;
 }
 @font-face {
   font-family: 'monospace';
@@ -61,6 +59,8 @@ img {
 .ag-timeline_tagline {
   font-size: 60px;
   color: #fff;
+  text-transform: uppercase;
+  font-weight: 600
 }
 .ag-timeline_title {
   background-image: url(https://raw.githubusercontent.com/SochavaAG/example-mycode/master/pens/timeline/images/bg.jpg);
@@ -71,14 +71,13 @@ img {
   background-clip: text;
   text-fill-color: transparent;
   color: transparent;
-  font-size: 80px;
 }
 
 .ag-timeline_item {
   margin: 0 0 50px;
-
   position: relative;
 }
+
 .ag-timeline_item:nth-child(2n) {
   text-align: right;
 }
@@ -88,13 +87,12 @@ img {
   width: 100%;
   max-width: 100%;
   margin: 0 auto;
-
   position: relative;
 }
+
 .ag-timeline_line {
   width: 2px;
   background-color: #393935;
-
   position: absolute;
   top: 2px;
   left: 50%;
@@ -153,12 +151,12 @@ img {
 }
 .ag-timeline-card_meta {
   margin: 10px 0 0;
-
   font-family: 'monospace', sans-serif;
   font-weight: bold;
-  font-size: 28px;
+  font-size: 1.5vw;
   color: #FF0;
 }
+
 .ag-timeline-card_item {
   display: inline-block;
   width: 45%;
@@ -243,16 +241,14 @@ img {
 .ag-timeline-card_title {
   display: none;
   margin: 10px 0 0;
-
   font-family: 'monospace', sans-serif;
   font-weight: bold;
-  font-size: 28px;
+  font-size: 30px;
   color: #FF0;
 }
 .ag-timeline-card_desc {
   line-height: 1.45;
-
-  font-size: 16px;
+  font-size: 20px;
   color: #FFF;
 }
 

@@ -34,12 +34,6 @@ body {
 margin-bottom: 3%; /* You can adjust the spacing as needed */
 }
 
-.video-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
 
 .h2 {
   padding: 0 12%;
@@ -144,3 +138,77 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
   background: #CD201F;
   color: #ffffff;
 }
+
+.table {
+    width: 80%;
+    margin: 0 auto;
+    border-collapse: collapse;
+}
+.th, .td {
+    border: 1px solid #333;
+    padding: 10px;
+    text-align: left;
+}
+
+.fact-vs-myth {
+    position: absolute;
+    bottom: 120px;
+    left: 200px;
+    text-align: center;
+    min-width: 125px;
+    background: #519e96;
+    color: white;
+    border-radius: 5px;
+    padding: 0.4rem 0.5rem;
+    font-weight: 600;
+    font-size: 26px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.my-jour {
+    position: absolute;
+    bottom: 120px;
+    left: 600px;
+    text-align: center;
+    min-width: 125px;
+    background: #519e96;
+    color: white;
+    border-radius: 5px;
+    padding: 0.4rem 0.5rem;
+    font-weight: 600;
+    font-size: 26px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+.why-choose-me {
+    position: absolute;
+    bottom: 120px;
+    left: 980px;
+    text-align: center;
+    min-width: 125px;
+    background: #519e96;
+    color: white;
+    border-radius: 5px;
+    padding: 0.4rem 0.5rem;
+    font-weight: 600;
+    font-size: 26px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+.charges {
+    position: absolute;
+    bottom: 120px;
+    left: 1400px;
+    text-align: center;
+    min-width: 125px;
+    background: #519e96;
+    color: white;
+    border-radius: 5px;
+    padding: 0.4rem 0.5rem;
+    font-weight: 600;
+    font-size: 26px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
