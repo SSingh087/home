@@ -211,7 +211,7 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
   border-radius: 5px;
   padding: 0.4rem 0.5rem;
   font-weight: 600;
-  font-size: 16px; /* Adjusted font size for mobile */
+  font-size: 15px; /* Adjusted font size for mobile */
   letter-spacing: 1px;
   text-transform: uppercase;
   display: flex; /* Use flexbox to center content */
