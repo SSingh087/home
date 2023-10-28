@@ -139,13 +139,13 @@ body{
 
 .expanding-div {
   position: absolute;
-  bottom:5%;
-  left:10%;
   display: none;
-  width: 1500px; /* Adjust the height as needed */
+  width: 80%; /* Adjust the height as needed */
   overflow: hidden;
-  font-size: 30px;
+  font-size: 1.5vw;
   color: #fff;
+  margin: 25% auto;
   font-family: monospace;
+  text-align:justify;
   background-color: rgba(20, 10, 30, 1);
 }

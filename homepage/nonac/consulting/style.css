@@ -129,7 +129,7 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
 .my-jour {
     position: absolute;
     bottom: 120px;
-    left: 700px;
+    left: 600px;
     text-align: center;
     min-width: 125px;
     background: #519e96;
@@ -141,10 +141,11 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
     letter-spacing: 1px;
     text-transform: uppercase;
 }
+
 .why-choose-me {
     position: absolute;
     bottom: 120px;
-    left: 1050px;
+    left: 880px;
     text-align: center;
     min-width: 125px;
     background: #519e96;
@@ -156,6 +157,23 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
     letter-spacing: 1px;
     text-transform: uppercase;
 }
+
+.services {
+    position: absolute;
+    bottom: 120px;
+    left: 1250px;
+    text-align: center;
+    min-width: 125px;
+    background: #519e96;
+    color: white;
+    border-radius: 5px;
+    padding: 0.4rem 0.5rem;
+    font-weight: 600;
+    font-size: 26px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
 .charges {
     position: absolute;
     bottom: 120px;
@@ -170,6 +188,10 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
     font-size: 26px;
     letter-spacing: 1px;
     text-transform: uppercase;
+}
+
+ul {
+    list-style-type: disc; /* Use disc for bullet points */
 }
 
 @media screen and (max-width: 768px) {
@@ -202,6 +224,7 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
 .fact-vs-myth,
 .my-jour,
 .why-choose-me,
+.services,
 .charges {
   position: static; /* Remove absolute positioning for mobile */
   text-align: center;
