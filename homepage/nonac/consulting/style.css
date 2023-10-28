@@ -113,7 +113,7 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
 .fact-vs-myth {
     position: absolute;
     bottom: 120px;
-    left: 300px;
+    left: 15%;
     text-align: center;
     min-width: 125px;
     background: #519e96;
@@ -121,7 +121,7 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
     border-radius: 5px;
     padding: 0.4rem 0.5rem;
     font-weight: 600;
-    font-size: 26px;
+    font-size: 1.4vw;
     letter-spacing: 1px;
     text-transform: uppercase;
 }
@@ -129,7 +129,7 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
 .my-jour {
     position: absolute;
     bottom: 120px;
-    left: 600px;
+    left: 30%;
     text-align: center;
     min-width: 125px;
     background: #519e96;
@@ -137,7 +137,7 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
     border-radius: 5px;
     padding: 0.4rem 0.5rem;
     font-weight: 600;
-    font-size: 26px;
+    font-size: 1.4vw;
     letter-spacing: 1px;
     text-transform: uppercase;
 }
@@ -145,7 +145,7 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
 .why-choose-me {
     position: absolute;
     bottom: 120px;
-    left: 880px;
+    left: 45%;
     text-align: center;
     min-width: 125px;
     background: #519e96;
@@ -153,7 +153,7 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
     border-radius: 5px;
     padding: 0.4rem 0.5rem;
     font-weight: 600;
-    font-size: 26px;
+    font-size: 1.4vw;
     letter-spacing: 1px;
     text-transform: uppercase;
 }
@@ -161,7 +161,7 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
 .services {
     position: absolute;
     bottom: 120px;
-    left: 1250px;
+    left: 63%;
     text-align: center;
     min-width: 125px;
     background: #519e96;
@@ -169,7 +169,7 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
     border-radius: 5px;
     padding: 0.4rem 0.5rem;
     font-weight: 600;
-    font-size: 26px;
+    font-size: 1.4vw;
     letter-spacing: 1px;
     text-transform: uppercase;
 }
@@ -177,7 +177,7 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
 .charges {
     position: absolute;
     bottom: 120px;
-    left: 1500px;
+    left: 75%;
     text-align: center;
     min-width: 125px;
     background: #519e96;
@@ -185,7 +185,7 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
     border-radius: 5px;
     padding: 0.4rem 0.5rem;
     font-weight: 600;
-    font-size: 26px;
+    font-size: 1.4vw;
     letter-spacing: 1px;
     text-transform: uppercase;
 }
