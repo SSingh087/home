@@ -195,6 +195,20 @@ ul {
     list-style-type: disc; /* Use disc for bullet points */
 }
 
+li {
+display: block;
+margin-bottom: 10px;
+cursor: pointer;
+}
+
+.expanded {
+display: block;
+}
+
+.collapsed {
+display: none;
+}
+
 @media screen and (max-width: 768px) {
   .ag-timeline_tagline,
   .main,
