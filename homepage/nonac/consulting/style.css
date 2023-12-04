@@ -114,7 +114,7 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
 .fact-vs-myth {
     position: absolute;
     bottom: 120px;
-    left: 15%;
+    left: 8%;
     text-align: center;
     min-width: 125px;
     background: #519e96;
@@ -130,7 +130,7 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
 .my-jour {
     position: absolute;
     bottom: 120px;
-    left: 30%;
+    left: 23%;
     text-align: center;
     min-width: 125px;
     background: #519e96;
@@ -146,7 +146,7 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
 .why-choose-me {
     position: absolute;
     bottom: 120px;
-    left: 45%;
+    left: 38%;
     text-align: center;
     min-width: 125px;
     background: #519e96;
@@ -162,7 +162,7 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
 .services {
     position: absolute;
     bottom: 120px;
-    left: 63%;
+    left: 57%;
     text-align: center;
     min-width: 125px;
     background: #519e96;
@@ -178,7 +178,7 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
 .charges {
     position: absolute;
     bottom: 120px;
-    left: 75%;
+    left: 70%;
     text-align: center;
     min-width: 125px;
     background: #519e96;
@@ -191,6 +191,37 @@ margin-bottom: 3%; /* You can adjust the spacing as needed */
     text-transform: uppercase;
 }
 
+.support {
+    position: absolute;
+    bottom: 120px;
+    left: 80%;
+    text-align: center;
+    min-width: 125px;
+    background: #519e96;
+    color: white;
+    border-radius: 5px;
+    padding: 0.4rem 0.5rem;
+    font-weight: 600;
+    font-size: 1.4vw;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.donate{
+    position: absolute;
+    bottom: -400px;
+    left: 47%;
+    text-align: center;
+    min-width: 125px;
+    background: #519e96;
+    color: white;
+    border-radius: 5px;
+    padding: 0.4rem 0.5rem;
+    font-weight: 600;
+    font-size: 1.4vw;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
 ul {
     list-style-type: disc; /* Use disc for bullet points */
 }
@@ -240,7 +271,9 @@ display: none;
 .my-jour,
 .why-choose-me,
 .services,
-.charges {
+.charges,
+.support,
+.donate {
   position: static; /* Remove absolute positioning for mobile */
   text-align: center;
   width: 100%; /* Full width for mobile */
