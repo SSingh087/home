@@ -26,6 +26,11 @@ header img {
   order: -1;
 }
 
+.contact{
+  background: rgb(230, 230, 230);
+  padding: 2% 0%;
+}
+
 nav {
   display: flex;
 }
@@ -40,8 +45,8 @@ nav a {
 .main{
   background: rgb(131,58,180);
   background: linear-gradient(270deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 52%, rgba(252,176,69,1) 100%);
-  height: 500px; /* Adjust the height as needed */
-  padding: 8% 8%;
+  height: 100px; /* Adjust the height as needed */
+  padding: 10% 10%;
   color: #fff;
   text-align: left;
   }
@@ -62,84 +67,25 @@ nav a {
   margin-right: 50%;
 }
 
-.why-me {
-  background: rgb(230, 230, 230);
-  font-size: 1.2vw;
-  padding: 3% 8%;
-  width: 100%;
-  display: flex;
-  color: #000000;
-  text-align: justify;
-}
-
-.col-1 {
-  padding: 0 3%; /* Adjust the value as needed */
-  box-sizing: border-box;
-  width: 50%;
-}
-
-.col-1 h1 {
-  font-size: 1.5vw;
-}
-
-
-.col-2 {
-  padding: 0 3%; /* Adjust the value as needed */
-  box-sizing: border-box;
-  width: 50%;
-  font-size: 18px;
-  display: grid;
-  grid-template-rows: repeat(3, 1fr);
-  grid-template-columns: repeat(2, 1fr);
-  gap: 3% 5%; 
-}
-
-.col-2 h1 {
-  font-size: 30px;
-}
-
-.contact-button {
+.text {
+  background: rgb(255, 255, 255);
   position: relative;
-  left: 70%;
-  top: -50%;
-  text-align: center;
-  background: #d1cdc9;
-  color: rgb(0, 0, 0);
-  border-radius: 15px;
-  padding: 0.4rem 0.5rem;
-  font-weight: 600;
+  left: 10%;
+  font-size: 1.2vw;
+  width: 80%;
+  color: #000000;
+  text-align: left;
+  min-width: 125px;
+  border-radius: 50px;
+  padding: 3rem 2.5rem;
+  font-weight: 400;
   font-size: 1.4vw;
   letter-spacing: 1px;
-  text-transform: uppercase;
+  margin-top: 3%
 }
 
-.services {
-  background: rgb(255, 255, 255);
-  font-size: 1.2vw;
-  padding: 2% 8%;
-  width: 100%;
-  color: #000000;
-  text-align: center;
-}
-
-.services h1{
-  font-size: 1.5vw;
-}
-
-.list-ser{
-  padding: 2% 10%; /* Adjust the value as needed */
-  box-sizing: border-box;
-  width: 100%;
-  font-size: 25px;
-  display: grid;
-  grid-template-rows: repeat(3, 1fr);
-  grid-template-columns: repeat(3, 1fr);
-  gap: 25% 1%; 
-}
-
-.contact{
-  background: rgb(230, 230, 230);
-  padding: 2% 0%;
+.text h1{
+  font-size: 1.6vw;
 }
 
 .wrapper {
@@ -199,6 +145,7 @@ nav a {
   visibility: visible;
   pointer-events: auto;
 }
+
 .table {
     width: 80%;
     margin: 0 auto;
