@@ -6,20 +6,20 @@
   <link href="https://fonts.googleapis.com/css?family=Montserrat:200,700&display=swap" rel="stylesheet">
   <link rel='stylesheet' href='https://unpkg.com/backpack.css'>
   <link rel="stylesheet" href="./style.css">
-  <link rel="icon" href="G.ico" type="image/x-icon">  
+  <link rel="icon" href="GSAAS.ico" type="image/x-icon">  
   <meta name="viewport" content="width=device-width, initial-scale=1"><link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css'><link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
   <header>
-    <img src="../GSAAS.png" alt="Icon">
+    <a href="./index.html"><img src="GSAAS.png" alt="Icon"></a>
     <nav>
-      <a href="#fact-myth">FACT vs MYTH</a>
-      <a href="#journey">MY JOURNEY</a>
-      <a href="#choose-me">WHY CHOOSE ME ?</a>
-      <a href="#services">SERVICES</a>
-      <a href="#fees">FEES</a>
-      <a href="#support">SUPPORT US</a>
+      <a href="WHY-CHOOSE-ME/index.html">WHY CHOOSE ME ?</a>
+      <a href="MY-JOURNEY/index.html">MY JOURNEY</a>
+      <a href="FACT-MYTH/index.html">FACT vs MYTH</a>
+      <a href="SERVICES/index.html">SERVICES</a>
+      <a href="FEES/index.html">FEES</a>
+      <a href="SUPPORT/index.html">SUPPORT US</a>
       <a href="#connect">Connect now</a>  
     </nav>
   </header>
@@ -27,15 +27,18 @@
   <div class="main">
     <h1><strong>Graduate School Admission Assistance Service</strong></h1>
     <p> Tailored for aspiring graduate students in STEM. I'm here to offer you guidance on navigating this journey effectively and helping you stand out.</p>
-    <a class="contact-button" href="#a"><button>START YOUR JOURNEY NOW ➡️ </button></a>
+    <a class="contact-button" href="#start-now"><button>START YOUR JOURNEY NOW ➡️ </button></a>
   </div>
 
 
   <div class="why-me">
     <div class="col-1">
-      <b><h1>Why choose GSAAS ?</h1></b>  
-      <p>Having gone through the process myself, I understand entirely the dream and hopes of a graduate applicant and the worries and pressure endured during this journey. I'm here to assist you in navigating the challenging world of STEM graduate admissions. In an environment where getting into top US/UK master's programs can be as challenging as 4.5%, and certain doctoral programs go as low as 3%, <b>having some experienced guidance is vital for creating an outstanding application</b>.</p>
-      <a class="why-choose-me" href="./why-choose-me.html"><button>Know more ..</button></a>
+      <h1><b>Why choose GSAAS ?</b></h1>
+      <p>Having gone through the process myself, I completely understand the dreams and hopes of a graduate applicant and the pressure endured during this journey. I'm here to assist you in navigating the challenging world of STEM graduate admissions. In an environment where getting into top US/UK master's programs can be as difficult as 4.5%, and certain doctoral programs go as low as 3%, <b>having some experienced guidance is vital for creating an outstanding application</b>.</p>
+      <br>
+
+      <!-- <a class="contact-button" href="#a"><button>START YOUR JOURNEY NOW ➡️ </button></a> -->
+      <a class="why-choose-me" href="WHY-CHOOSE-ME/index.html"><button>Know more ..</button></a>
     </div>
   
     <div class="col-2">
@@ -55,7 +58,33 @@
 
   </div>
 
-  <div class="services">
+  <div id="start-now" class="services">
+    <h1><strong>Services Offered within GSAAS</strong></h1>
+    <section class="hero-section">
+      <div class="card-grid">
+        <a class="card" href="SERVICES/index.html">
+          <div class="card__background" style="background: linear-gradient(180deg, rgba(255,176,176,1) 0%, rgba(238,209,176,1) 66%);"></div>
+          <div class="card__content">
+            <h3 class="card__heading"><strong>Masters, PhD Application</strong></h3>
+          </div>
+        </a>
+        <a class="card" href="SERVICES/index.html">
+          <div class="card__background" style="background: linear-gradient(180deg, rgba(255,176,176,1) 0%, rgba(238,209,176,1) 66%);"></div>
+          <div class="card__content">
+            <h3 class="card__heading"><strong>Resume and Letters</strong></h3>
+          </div>
+        </a>
+        <a class="card" href="SERVICES/index.html">
+          <div class="card__background" style="background: linear-gradient(180deg, rgba(255,176,176,1) 0%, rgba(238,209,176,1) 66%);"></div>
+          <div class="card__content">
+            <p class="card__category"> </p>
+            <h3 class="card__heading"><strong>Final Review of Applicaiton </strong> </h3>
+          </div> 
+        </a>
+    </section>
+  </div>
+
+  <!-- <div class="services">
     <h1><strong>Services Offered within GSAAS</strong></h1>
     <div class="list-ser">
       <div class="service 1"><a href="./Master's application_NoCopy.pdf" style="color: black;">Master Application</a></div>
@@ -68,21 +97,15 @@
       <div class="service 8"><a href="./Master's application_NoCopy.pdf" style="color: black;">Guidance on Standardized Tests</a></div>
       <div class="service 9"><a href="./Master's application_NoCopy.pdf" style="color: black;">Application from scratch</a></div>
     </div>
-  </div>
+  </div> -->
 
-  <div class="contact">
+  <div id="connect" class="contact">
     <center><strong>Connect now</strong></center>
     <ul class="wrapper">
         <li class="icon facebook">
           <span class="tooltip"> </span>
           <a href="https://www.linkedin.com/in/ssingh087/">
             <span><i class="fab fa-linkedin"></i></span>
-          </a>
-        </li>
-        <li class="icon twitter">
-          <span class="tooltip"> </span>
-          <a href="https://twitter.com/SSingh087">
-            <span><i class="fab fa-twitter"></i></span>
           </a>
         </li>
         <li class="icon github">
@@ -97,16 +120,14 @@
             <span><i class="fa fa-phone"></i></span>
           </a>
         </li>  
-        <li class="icon paypal">
+        <!-- <li class="icon paypal">
           <span class="tooltip"> </span>
           <a href="https://www.paypal.com/donate/?hosted_button_id=K8TENYBSUZ672">
             <span><i class="fab fa-paypal"></i></span>
           </a>
-        </li>  
+        </li>   -->
       </ul>
+    <center><small>&copy; 2024 SHASHWAT SINGH</small></center>
     </div>
 </body>
 </html>
-
-
-
