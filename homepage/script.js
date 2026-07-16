@@ -219,18 +219,19 @@ class App extends React.Component {
           onClick: this.nonac }, "Outside academia")
       ), /*#__PURE__*/
 
-      React.createElement("button", {
-        className: "trap-button",
-        onClick: this.handleButtonClicked },	
-      gameOver && "new physics unlocked", 
-      cursorGrabbed && "Trapped in blackhole",
-      !gameOver && !cursorGrabbed && "Peek in blackhole"), /*#__PURE__*/
+      // React.createElement("button", {
+      //   className: "trap-button",
+      //   onClick: this.handleButtonClicked },	
+      // gameOver && "new physics unlocked", 
+      // cursorGrabbed && "Trapped in blackhole",
+      // !gameOver && !cursorGrabbed && "Peek in blackhole"), /*#__PURE__*/
 
-      React.createElement("div", { className: "grab-zone-wrapper" }, /*#__PURE__*/
-      React.createElement(GrabZone, {
-        onCursorGrabbed: this.handleCursorGrabbed,
-        cursorGrabbed: cursorGrabbed,
-        gameOver: gameOver }))));
+      // React.createElement("div", { className: "grab-zone-wrapper" }, /*#__PURE__*/
+      // React.createElement(GrabZone, {
+      //   onCursorGrabbed: this.handleCursorGrabbed,
+      //   cursorGrabbed: cursorGrabbed,
+      //   gameOver: gameOver }))
+      ));
 
   }}
 
