@@ -61,16 +61,26 @@ const useHover = () => {
   return [ref, hovered];
 };
 
-// Mouse position
+// Mouse and Touch position hook
 const useMousePosition = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    const setFromEvent = e => setPosition({ x: e.clientX, y: e.clientY });
+    const setFromEvent = e => {
+      if (e.touches && e.touches.length > 0) {
+        setPosition({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+      } else {
+        setPosition({ x: e.clientX, y: e.clientY });
+      }
+    };
     window.addEventListener("mousemove", setFromEvent);
+    window.addEventListener("touchmove", setFromEvent, { passive: true });
+    window.addEventListener("touchstart", setFromEvent, { passive: true });
 
     return () => {
       window.removeEventListener("mousemove", setFromEvent);
+      window.removeEventListener("touchmove", setFromEvent);
+      window.removeEventListener("touchstart", setFromEvent);
     };
   }, []);
 
@@ -119,6 +129,7 @@ class App extends React.Component {
     this.research = this.research.bind(this);
     this.resume = this.resume.bind(this);
     this.nonac = this.nonac.bind(this);
+    this.publications = this.publications.bind(this);
   }
 
   timeline() {
@@ -127,6 +138,10 @@ class App extends React.Component {
 
   research() {
     location.href = "./research/index.html";
+  }
+
+  publications() {
+    location.href = "./publications/index.html";
   }
 
   resume() {
@@ -180,41 +195,43 @@ class App extends React.Component {
 
       React.createElement("p", null, "Beyond the academic realm, I co-founded ", React.createElement("a", { href: "https://www.bosex.org/"}, "Bose.X"), ", a research group dedicated to supporting and promoting undergraduate research. I also started a blog/educational channel - ", React.createElement("a", { href: "./nonac/grawitty/Grawitty-loader.html"}, "GRA-WITTY"), " where I aim to share latest updates on astrophysics and explain academic articles. If you would like to contribute to this endeavor feel free to ", React.createElement("a", { href: ".mailto:s.singh.3@research.gla.ac.uk?subject=Inquiry on Grawitty"}, "contact"),  " me."),
 
-      React.createElement("p", null, "Check out my drawer where I keep my social connections  ...."),
+      React.createElement("p", null, "Check out my drawer where I keep my social connections  ....")), /*#__PURE__*/
 
+      React.createElement("div", { className: "nav-buttons-container" },
+        React.createElement("button", {
+          className: "timeline",
+          onClick: this.timeline }, "Timeline"),
 
-      React.createElement("button", {
-        className: "timeline",
-        onClick: this.timeline }, "Timeline"),
+        React.createElement("button", {
+          className: "research",
+          onClick: this.research }, "Research"),
 
-      React.createElement("button", {
-        className: "research",
-        onClick: this.research }, "Research"),
+        React.createElement("button", {
+          className: "publications",
+          onClick: this.publications }, "Publications"),
 
-      React.createElement("button", {
-        className: "resume",
-        onClick: this.resume }, "Resume"),
+        React.createElement("button", {
+          className: "resume",
+          onClick: this.resume }, "Resume"),
 
-      React.createElement("button", {
-        className: "nonac",
-        onClick: this.nonac }, "Outside academia"),
+        React.createElement("button", {
+          className: "nonac",
+          onClick: this.nonac }, "Outside academia")
+      ), /*#__PURE__*/
 
-      React.createElement("button", {
-        className: "debug-button",
-        onClick: this.handleToggleDebug }, "X")), /*#__PURE__*/
+      // React.createElement("button", {
+      //   className: "trap-button",
+      //   onClick: this.handleButtonClicked },	
+      // gameOver && "new physics unlocked", 
+      // cursorGrabbed && "Trapped in blackhole",
+      // !gameOver && !cursorGrabbed && "Peek in blackhole"), /*#__PURE__*/
 
-      React.createElement("button", {
-        className: "trap-button",
-        onClick: this.handleButtonClicked },	
-      gameOver && "new physics unlocked", 
-      cursorGrabbed && "Trapped in blackhole",
-      !gameOver && !cursorGrabbed && "Peek in blackhole"), /*#__PURE__*/
-
-      React.createElement("div", { className: "grab-zone-wrapper" }, /*#__PURE__*/
-      React.createElement(GrabZone, {
-        onCursorGrabbed: this.handleCursorGrabbed,
-        cursorGrabbed: cursorGrabbed,
-        gameOver: gameOver }))));
+      // React.createElement("div", { className: "grab-zone-wrapper" }, /*#__PURE__*/
+      // React.createElement(GrabZone, {
+      //   onCursorGrabbed: this.handleCursorGrabbed,
+      //   cursorGrabbed: cursorGrabbed,
+      //   gameOver: gameOver }))
+      ));
 
   }}
 

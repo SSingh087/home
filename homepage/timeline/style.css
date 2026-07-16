@@ -1,3 +1,55 @@
+/* Glassmorphic Navbar */
+.navbar {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background: rgba(20, 10, 30, 0.75);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 1000;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  box-sizing: border-box;
+}
+
+.nav-back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #fff;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: none;
+  transition: all 0.3s ease;
+}
+
+.nav-back-button:hover {
+  color: #FF0;
+  text-shadow: 0 0 10px rgba(255, 255, 0, 0.4);
+  transform: translateX(-3px);
+  border-bottom: none;
+}
+
+.navbar-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
 body {
   background-color: rgba(20, 10, 30, 1);
   overflow-x: hidden;
@@ -254,7 +306,70 @@ img {
 
 
 @media screen and (max-width: 768px) {
-  .ag-timeline_tagline{
-    font-size: 12vw; /* Increase font size for smaller screens */
+  .ag-timeline_tagline {
+    font-size: 2.2rem;
+  }
+  
+  .navbar-container {
+    padding: 0.8rem 1rem;
+  }
+  
+  .navbar-title {
+    display: none; /* Hide title on small screens to save space */
+  }
+
+  .ag-format-container {
+    width: 100%;
+    padding: 0 15px;
+  }
+
+  .ag-timeline_line {
+    left: 40px;
+  }
+
+  .ag-timeline-card_box,
+  .ag-timeline_item:nth-child(2n) .ag-timeline-card_box {
+    padding: 0 0 20px 80px;
+    text-align: left;
+  }
+
+  .ag-timeline-card_point-box,
+  .ag-timeline_item:nth-child(2n) .ag-timeline-card_point-box {
+    margin: 0;
+    position: absolute;
+    left: 15px;
+    top: 0;
+  }
+
+  .ag-timeline-card_meta-box {
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .ag-timeline-card_meta {
+    font-size: 1rem;
+  }
+
+  .ag-timeline-card_item {
+    width: 100%;
+    margin: 0;
+  }
+
+  .ag-timeline_item:nth-child(2n+1) .ag-timeline-card_item,
+  .ag-timeline_item:nth-child(2n) .ag-timeline-card_item {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  .ag-timeline-card_arrow {
+    display: none; /* Hide arrows on mobile to look cleaner */
+  }
+  
+  .ag-timeline-card_info {
+    padding: 15px;
+  }
+  
+  .ag-timeline-card_desc {
+    font-size: 15px;
   }
 }

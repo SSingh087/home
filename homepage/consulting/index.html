@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shashwat Singh | Consulting & Mentorship</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Space+Grotesk:wght@400;600&family=Fira+Code:wght@300;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --background-dark: #080412;
+      --bg-cosmic: radial-gradient(circle at 50% 30%, rgba(28, 12, 55, 1) 0%, rgba(8, 4, 18, 1) 100%);
+      --accent-gold: hsl(38, 100%, 55%);
+      --accent-teal: #519e96;
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.7);
+      --glass-bg: rgba(25, 15, 45, 0.45);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --font-header: 'Space Grotesk', sans-serif;
+      --font-body: 'Outfit', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      background-color: var(--background-dark);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    /* Glassmorphic Navbar */
+    .navbar {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      background: rgba(20, 10, 30, 0.75);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+      z-index: 1000;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .navbar-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+    }
+
+    .nav-back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #fff;
+      font-family: var(--font-header);
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .nav-back-button:hover {
+      color: var(--accent-gold);
+      text-shadow: 0 0 10px rgba(255, 180, 50, 0.4);
+      transform: translateX(-3px);
+    }
+
+    .navbar-title {
+      font-family: var(--font-header);
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    /* Main Showcase Content */
+    .hero-section {
+      background: var(--bg-cosmic);
+      min-height: calc(100vh - 70px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 4rem 2rem;
+    }
+
+    .content-card {
+      max-width: 800px;
+      width: 100%;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 3.5rem;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      animation: fadeInUp 0.5s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-family: var(--font-header);
+      font-size: 2.8rem;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, #ffffff 40%, var(--accent-teal) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      font-size: 1.25rem;
+      color: var(--accent-gold);
+      margin-bottom: 2rem;
+      font-weight: 400;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    p {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+      font-weight: 300;
+    }
+
+    /* Expertise Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 2.5rem 0;
+    }
+
+    .grid-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .grid-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--accent-teal);
+      transform: translateY(-2px);
+    }
+
+    .grid-item h3 {
+      font-family: var(--font-header);
+      color: #fff;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .grid-item p {
+      font-size: 0.95rem;
+      margin-bottom: 0;
+    }
+
+    /* Action Buttons */
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.9rem 1.8rem;
+      border-radius: 12px;
+      font-family: var(--font-header);
+      font-weight: 600;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-teal) 0%, #3e8079 100%);
+      color: #fff;
+      box-shadow: 0 10px 20px rgba(81, 158, 150, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 25px rgba(81, 158, 150, 0.4);
+      filter: brightness(1.1);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-3px);
+    }
+
+    /* Responsive styling */
+    @media (max-width: 768px) {
+      .navbar-container {
+        padding: 0.8rem 1rem;
+      }
+      .navbar-title {
+        display: none;
+      }
+      .content-card {
+        padding: 2rem 1.5rem;
+      }
+      h1 {
+        font-size: 2.2rem;
+      }
+      .subtitle {
+        font-size: 1.05rem;
+        margin-bottom: 1.5rem;
+      }
+      .grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin: 1.5rem 0;
+      }
+      .button-group {
+        flex-direction: column;
+      }
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="navbar-container">
+    <a href="../index.html" class="nav-back-button">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      <span>Back to Home</span>
+    </a>
+    <span class="navbar-title">Consulting & Mentorship</span>
+  </div>
+</nav>
+
+<section class="hero-section">
+  <div class="content-card">
+    <h1>Consulting & Mentorship</h1>
+    <div class="subtitle">Applying astrophysics rigor to practical challenges</div>
+    
+    <p>Leveraging specialized training in general relativity, statistical data analysis, and advanced numerical methods, I offer research consulting, academic mentorship, and science communication services.</p>
+    
+    <p>Whether you are an undergraduate student seeking guidance on research pathways, an institution organizing outreach campaigns, or a technical team looking for expertise in signal modeling and machine learning, feel free to connect.</p>
+    
+    <div class="grid">
+      <div class="grid-item">
+        <h3>Academic Mentorship</h3>
+        <p>Providing guidance for undergraduate research in physics and mathematics, preparing applicants for competitive graduate opportunities, and developing research methodologies.</p>
+      </div>
+      
+      <div class="grid-item">
+        <h3>Astronomy Outreach</h3>
+        <p>Developing engaging educational content, explaining advanced astrophysical discoveries (such as Gravitational Waves) for public and academic audiences, and leading interactive science channels.</p>
+      </div>
+
+      <div class="grid-item">
+        <h3>Signal & Data Analysis</h3>
+        <p>Expertise in analyzing complex datasets, parameter estimation using Markov Chain Monte Carlo (MCMC) methods, and designing machine learning workflows for prediction and inference.</p>
+      </div>
+
+      <div class="grid-item">
+        <h3>Numerical Modeling</h3>
+        <p>Developing robust Python and scientific programming simulations for astrophysics, orbital dynamics, and wave equations.</p>
+      </div>
+    </div>
+    
+    <div class="button-group">
+      <a href="mailto:s.singh.3@research.gla.ac.uk?subject=Inquiry on Consulting/Mentorship" class="btn btn-primary">Nudge Me for Inquiries</a>
+      <a href="../nonac/index.html" class="btn btn-secondary">Outside Academia</a>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
