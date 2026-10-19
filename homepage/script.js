@@ -130,6 +130,7 @@ class App extends React.Component {
     this.resume = this.resume.bind(this);
     this.nonac = this.nonac.bind(this);
     this.publications = this.publications.bind(this);
+    this.quant = this.quant.bind(this);
   }
 
   timeline() {
@@ -150,6 +151,10 @@ class App extends React.Component {
 
   nonac() {
     location.href = "./nonac/index.html";
+  }
+
+  quant() {
+    location.href = "./quant/index.html";
   }
 
 
@@ -216,7 +221,11 @@ class App extends React.Component {
 
         React.createElement("button", {
           className: "nonac",
-          onClick: this.nonac }, "Outside academia")
+          onClick: this.nonac }, "Outside academia"),
+
+        React.createElement("button", {
+          className: "nonac",
+          onClick: this.quant }, "Quant research")
       ), /*#__PURE__*/
 
       // React.createElement("button", {

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shashwat Singh | Quant Research</title>
+  <meta name="description" content="Surrogate-accelerated hierarchical Bayesian inference for commodity term structures: gold and Brent futures, with calibration checks and an honest backtest.">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./quant.css">
+</head>
+<body>
+  <nav id="nav">
+    <a class="back" href="../index.html">&larr; Home</a>
+    <a href="#pipeline">Pipeline</a><a href="#curves">Curves</a><a href="#dynamics">Dynamics</a><a href="#populations">Populations</a><a href="#validation">Validation</a><a href="#backtest">Backtest</a><a href="#about">Limits &amp; next steps</a>
+  </nav>
+
+  <header class="hero">
+    <p class="kicker">Quantitative research project</p>
+    <h1>Commodity term structures, inferred like gravitational waves</h1>
+    <p class="lead">I took the hierarchical Bayesian population-inference machinery I use for gravitational-wave astrophysics and applied it to gold and Brent futures: a neural surrogate of the Schwartz&ndash;Smith two-factor model, nested sampling on every trading day, and a population layer that pools the days. Everything below is computed from the real fits and is interactive.</p>
+    <div class="kpis" id="kpis"></div>
+  </header>
+
+  <main>
+    <section id="pipeline">
+      <h2>The pipeline</h2>
+      <p class="sub">Four stages, each with its own checks before the next one is trusted.</p>
+      <div class="cards" id="stages"></div>
+    </section>
+
+    <section id="curves">
+      <h2>1 &middot; Forward curves and what the model infers from them</h2>
+      <p class="sub">Each trading day gives one forward curve. Only a few maturities actually trade (the dots); the fitted model gives a full curve with uncertainty, including a <em>model extrapolation</em> beyond the contracts that exist. Drag the slider or press play.</p>
+      <div class="toolbar"><div class="seg" id="segC"><button data-c="gold" class="on">Gold</button><button data-c="brent">Brent</button></div>
+        <button id="play" class="pill">&#9654; Play</button><input id="slider" type="range" min="0" max="0" value="0"><output id="dateOut"></output></div>
+      <div class="split">
+        <div class="chartbox tall"><canvas id="chCurve"></canvas></div>
+        <div class="side" id="daySide"></div>
+      </div>
+    </section>
+
+    <section id="dynamics">
+      <h2>2 &middot; How the inferred dynamics move through time</h2>
+      <p class="sub">Daily posterior for each parameter: the line is the median, the bands are 68% and 90% credible intervals. Click anywhere on the chart to jump the curve explorer to that day.</p>
+      <div class="toolbar"><select id="selParam"></select><div class="seg" id="segD"><button data-c="both" class="on">Both</button><button data-c="gold">Gold</button><button data-c="brent">Brent</button></div></div>
+      <div class="chartbox"><canvas id="chDyn"></canvas></div>
+      <p class="note" id="dynNote"></p>
+    </section>
+
+    <section id="populations">
+      <h2>3 &middot; Population level: do gold and Brent behave like different systems?</h2>
+      <p class="sub">Layer 2 pools every day&rsquo;s posterior into one population distribution per commodity (never mixing the two). Bars: where the individual days landed. Line: the hierarchical population-predictive distribution.</p>
+      <div class="toolbar"><select id="selPop"></select><div class="seg" id="segP"><button data-c="both" class="on">Both</button><button data-c="gold">Gold</button><button data-c="brent">Brent</button></div></div>
+      <div class="chartbox"><canvas id="chPop"></canvas></div>
+      <div class="chips" id="popChips"></div>
+    </section>
+
+    <section id="validation">
+      <h2>4 &middot; Validation: can the inference be trusted?</h2>
+      <p class="sub">Before touching market data, the pipeline is tested on synthetic curves whose true parameters are known.</p>
+      <h3>Surrogate vs the analytic model</h3>
+      <div class="split two"><div class="chartbox"><canvas id="chSurErr"></canvas></div><div class="chartbox"><canvas id="chSurScatter"></canvas></div></div>
+      <div class="chips" id="surChips"></div>
+      <h3>Injection&ndash;recovery calibration (PP plots)</h3>
+      <p class="sub">For each of 70 synthetic injections, where did the true value fall inside its own posterior? A calibrated method gives a diagonal line; the shaded band is the 95% envelope expected from only 70 injections.</p>
+      <div class="toolbar"><select id="selRun"></select><span id="runInfo" class="note"></span></div>
+      <div class="split two"><div class="chartbox tall"><canvas id="chPP"></canvas></div><div class="side" id="ppSide"></div></div>
+    </section>
+
+    <section id="backtest">
+      <h2>5 &middot; The real-market backtest, read honestly</h2>
+      <div class="callout"><strong>Read this before looking at any Sharpe ratio.</strong> The carry signal (is the curve backwardated or in contango?) <em>never changed sign</em> for gold and almost never for Brent, so the &ldquo;strategy&rdquo; is effectively one static position held for the whole sample. It does not demonstrate timing skill, and it ignores costs. I include it because showing what a result does <em>not</em> prove is part of doing the research properly.</div>
+      <div class="toolbar"><div class="seg" id="segB"><button data-c="gold" class="on">Gold</button><button data-c="brent">Brent</button></div></div>
+      <div class="split two"><div class="chartbox"><canvas id="chCarry"></canvas></div><div class="chartbox"><canvas id="chEq"></canvas></div></div>
+      <div id="btTable"></div>
+    </section>
+
+    <section id="about">
+      <h2>Limits and next steps</h2>
+      <div class="two-col">
+        <div><h3>What this is</h3><ul>
+          <li>A working end-to-end Bayesian pipeline: simulation, surrogate, calibration, per-day inference, population inference, real data.</li>
+          <li>A method transfer: the same hierarchical population-inference approach used for gravitational-wave populations, applied to a financial term structure.</li>
+          <li>Reproducible on a cluster: one HTCondor job per day, with a DAG linking the layers.</li></ul></div>
+        <div><h3>What it is not (yet)</h3><ul>
+          <li>The Schwartz&ndash;Smith forward curve has a closed form, so here the surrogate is a validated stand-in. Its real payoff is for products without one, such as options on futures priced by Monte Carlo, which is the natural next step.</li>
+          <li>The observation noise in the real-data fits is a placeholder, so credible-interval widths are illustrative, not calibrated to market microstructure.</li>
+          <li>The population is fitted per commodity on a single regime of roughly a year; there is no out-of-sample forecasting test yet.</li>
+          <li>Not a trading system and not investment advice.</li></ul></div>
+      </div>
+      <p class="foot">Data: futures prices fetched with <code>yfinance</code>; this page shows derived summaries only (quantiles, histograms, curves), not raw data. Stack: Python, PyTorch (MLP surrogate), <code>nessai</code> nested sampling, HTCondor.</p>
+    </section>
+  </main>
+  <script src="../vendor/chart/chart.umd.js"></script>
+  <script type="module" src="./quant.js"></script>
+</body>
+</html>
