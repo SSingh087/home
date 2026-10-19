@@ -32,7 +32,7 @@ export async function createWorld(cfg) {
   scene.add(sun);
 
   const spinners = [], colliders = [];
-  const solid = (x, z, r) => colliders.push({ x, z, r });
+  const solid = (x, z, r, prop = false) => colliders.push({ x, z, r, prop });
 
   // ---- island: chunky layered disc with a lip
   const top = new THREE.Mesh(new THREE.CylinderGeometry(R, R, 1.2, 72), M(T.ground)); top.position.y = -0.6; top.receiveShadow = true; scene.add(top);
@@ -64,11 +64,11 @@ export async function createWorld(cfg) {
     const D = PLACES[pc.id], p = { ...pc, ...D, build: pc.build, angle: pc.angle, dist: pc.dist };
     const a = p.angle * Math.PI / 180, x = Math.sin(a) * p.dist, z = Math.cos(a) * p.dist;
     const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = Math.atan2(-x, -z); g.scale.setScalar(SC_B); scene.add(g);
-    const info = p.build(g, spinners);
+    const info = p.build(g, spinners, pc.opts || {});
     info.r *= SC_B; info.front *= SC_B; info.h *= SC_B; info.cols.forEach(c => { c.x *= SC_B; c.z *= SC_B; c.r *= SC_B; });
     const cosr = Math.cos(g.rotation.y), sinr = Math.sin(g.rotation.y);
     const toWorld = (lx, lz) => ({ x: x + lx * cosr + lz * sinr, z: z - lx * sinr + lz * cosr });
-    info.cols.forEach(c => { const w = toWorld(c.x, c.z); solid(w.x, w.z, c.r); });
+    info.cols.forEach(c => { const w = toWorld(c.x, c.z); solid(w.x, w.z, c.r, c.prop); });
     const blob = new THREE.Mesh(new THREE.PlaneGeometry(info.r * 3, info.r * 3).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false }));
     blob.position.set(x, 0.04, z); scene.add(blob);
     // path from plaza to the pad
@@ -88,11 +88,11 @@ export async function createWorld(cfg) {
     return { ...p, x, z, pad, pg, arrow, halo, group: g, spring: 0, springV: 0, active: false };
   });
 
-  (cfg.extras || []).forEach(ex => { const a = ex.angle * Math.PI / 180, g = new THREE.Group(); g.position.set(Math.sin(a) * ex.dist, 0, Math.cos(a) * ex.dist); scene.add(g); const r = ex.build(g, 0, 0, ex.scale || 1); solid(g.position.x, g.position.z, r.r); });
+  (cfg.extras || []).forEach(ex => { const a = ex.angle * Math.PI / 180, g = new THREE.Group(); g.position.set(Math.sin(a) * ex.dist, 0, Math.cos(a) * ex.dist); scene.add(g); const r = ex.build(g, 0, 0, ex.scale || 1); solid(g.position.x, g.position.z, r.r, true); });
 
   // ---- decor: trees, bushes, lamps, benches
   const onPath = (x, z) => places.some(p => { const d = Math.hypot(p.pad.x, p.pad.z), t = (x * p.pad.x + z * p.pad.z) / d, perp = Math.abs((x * p.pad.z - z * p.pad.x) / d); return t > 0 && t < d + 3 && perp < 4; });
-  const free = (x, z, m) => places.every(p => Math.hypot(x - p.pad.x, z - p.pad.z) > 5.5) && !colliders.some(c => Math.hypot(x - c.x, z - c.z) < c.r + m) && !onPath(x, z) && Math.hypot(x, z) > PLAZA + 2 && Math.hypot(x, z) < R - 2;
+  const free = (x, z, m) => places.every(p => Math.hypot(x - p.pad.x, z - p.pad.z) > 5.5) && !colliders.some(c => Math.hypot(x - c.x, z - c.z) < c.r + (c.prop ? 9 : m)) && !onPath(x, z) && Math.hypot(x, z) > PLAZA + 2 && Math.hypot(x, z) < R - 2;
   {
     const N = 42, tr = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.28, 0.4, 1.8, 7), M(T.trunk), N);
     const c1 = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1.7, 1), M(T.leaf[0]), N), c2 = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1.2, 1), M(T.leaf[1]), N);
@@ -163,7 +163,7 @@ export async function createWorld(cfg) {
       mc.strokeStyle = '#' + new THREE.Color(T.path).getHexString(); mc.lineWidth = 3; mc.beginPath(); mc.moveTo(cx, cy); mc.lineTo(px, py); mc.stroke();
       mc.fillStyle = '#' + new THREE.Color(T.pad).getHexString(); mc.beginPath(); mc.arc(px, py, p.active ? 8 : 6, 0, 7); mc.fill();
       const dx = px - cx, dy = py - cy, dl = Math.hypot(dx, dy) || 1, lx = px + dx / dl * 14, ly = py + dy / dl * 12 + 3;
-      mc.font = '600 9px sans-serif'; mc.fillStyle = '#fff'; mc.strokeStyle = 'rgba(0,0,0,.7)'; mc.lineWidth = 3; mc.strokeText(p.short, lx, ly); mc.fillText(p.short, lx, ly); });
+      mc.font = '700 12px sans-serif'; mc.fillStyle = '#fff'; mc.strokeStyle = 'rgba(0,0,0,.7)'; mc.lineWidth = 3; mc.strokeText(p.short, lx, ly); mc.fillText(p.short, lx, ly); });
     const [px, py] = toMap(player.x, player.z), c = Math.cos(camYaw), s = Math.sin(camYaw), fx = Math.sin(player.face), fz = Math.cos(player.face);
     const ang = Math.atan2(fx * c - fz * s, -fx * s - fz * c);
     mc.save(); mc.translate(px, py); mc.rotate(ang); mc.fillStyle = '#fff'; mc.strokeStyle = '#222'; mc.lineWidth = 1.5;
@@ -175,10 +175,13 @@ export async function createWorld(cfg) {
   function showCard(p) {
     if (p === shown) return; shown = p; card.hidden = !p; if (!p) return;
     card.querySelector('h2').textContent = p.title; card.querySelector('p').textContent = p.summary;
-    list.innerHTML = p.items.map((it, i) => `<li><a href="${itemUrl(p.id, it.id)}"><span class="n">${i + 1}</span><span>${it.title}</span><span class="go">&rarr;</span></a></li>`).join('') +
+    list.innerHTML = p.items.map((it, i) => `<li><a href="${itemUrl(p.id, it.id)}"><span class="n">${i + 1}</span><span>${it.title}</span>${it.anim ? '<span class="pl">&#9654; animation</span>' : ''}<span class="go">&rarr;</span></a></li>`).join('') +
       `<li class="all"><a href="${itemUrl(p.id)}"><span class="n">&#9733;</span><span>Open the full page</span><span class="go">&rarr;</span></a></li>`;
   }
-  addEventListener('keydown', e => { if (!shown) return; const n = parseInt(e.key); if (n >= 1 && n <= shown.items.length) location.href = itemUrl(shown.id, shown.items[n - 1].id); else if (e.code === 'Enter') location.href = itemUrl(shown.id); });
+  let dismissed = null;
+  const dismiss = () => { dismissed = shown; showCard(null); };
+  $('close').addEventListener('click', dismiss);
+  addEventListener('keydown', e => { if (e.code === 'Escape' && shown) dismiss(); if (!shown) return; const n = parseInt(e.key); if (n >= 1 && n <= shown.items.length) location.href = itemUrl(shown.id, shown.items[n - 1].id); else if (e.code === 'Enter') location.href = itemUrl(shown.id); });
   function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w / h < 0.9 ? 40 : 28; camera.updateProjectionMatrix(); }
   addEventListener('resize', resize); resize();
 
@@ -225,7 +228,7 @@ export async function createWorld(cfg) {
       p.halo.scale.setScalar(1 + (on ? 0.25 : 0) + Math.sin(t * 3 + i) * 0.06);
     });
     spinners.forEach(o => { if (typeof o === 'function') o(t); else o.rotation.y = t * 0.8; });
-    showCard(near);
+    if (!near) dismissed = null; showCard(near === dismissed ? null : near);
     const fp = flyG.attributes.position; flySeed.forEach((q, i) => fp.setXYZ(i, Math.sin(q[0] + t * 0.05 * q[4]) * q[1], q[2] + Math.sin(t * q[4] + q[3]) * 0.8, Math.cos(q[0] + t * 0.05 * q[4]) * q[1])); fp.needsUpdate = true;
     drawMap(); renderer.render(scene, camera);
   });

@@ -1,17 +1,18 @@
 import { createWorld } from '../world/engine.js';
-import { iitIndore, aei, syrte } from '../world/buildings.js';
+import { iitIndore, aei, observatoire } from '../world/buildings.js';
 
+// Experience planet: a bright, cheerful candy-pastel world. No flag/landmark props here.
 createWorld({
   theme: {
-    sky: ['#1b1244', '#6b3a7a', '#f2a56a'], fog: 0x7a4a80, exposure: 1.1,
-    hemi: [0xffc9a0, 0x4a3a6a, 1.15], sun: [0xffb27a, 2.3],
-    ground: 0x9a8fd0, lip: 0xe0a060, rock: [0x4a3a66, 0x3a2c55], plaza: 0xd8c8dc, path: 0xe2c3a2, pad: 0x6be3ff,
-    trunk: 0x5a3a4a, leaf: [0x6a62c8, 0xa08cf0], flowers: [0xffd25a, 0x6be3ff, 0xff7a8a, 0xffffff],
-    cloud: 0xf2b8a0, particles: 0xfff0a0, lamp: 2.2, stars: true,
+    sky: ['#5ec3ff', '#a9e4ff', '#ffe8b0'], fog: 0xdff3ff, exposure: 1.1,
+    hemi: [0xe8f6ff, 0xffd9a8, 1.25], sun: [0xfff3d6, 2.5],
+    ground: 0xb6e68f, lip: 0xffc27a, rock: [0xf0a98a, 0xd9886b], plaza: 0xfff1d8, path: 0xffe2b5, pad: 0xff6fae,
+    trunk: 0x9a6a48, leaf: [0xff8fb8, 0xffc34d], flowers: [0xff6fae, 0xffd25a, 0xffffff, 0x6bd6ff],
+    cloud: 0xffffff, particles: 0xfff3a0, lamp: 0.9, stars: false,
   },
   places: [
-    { id: 'iit-indore', angle: 180, dist: 23, build: iitIndore },
-    { id: 'aei', angle: 60, dist: 23, build: aei },
-    { id: 'syrte', angle: -60, dist: 23, build: syrte },
+    { id: 'iit-indore', angle: 180, dist: 23, build: iitIndore, opts: { props: false } },
+    { id: 'aei', angle: 60, dist: 23, build: aei, opts: { props: false } },
+    { id: 'syrte', angle: -60, dist: 23, build: observatoire, opts: { props: false } }, // same building as the Education island's Observatoire
   ],
 });

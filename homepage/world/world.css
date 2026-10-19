@@ -28,3 +28,8 @@ a.chip:hover { background: rgba(255,170,60,.45); }
 #rotL { left: 24px; } #rotR { left: 84px; }
 [hidden] { display: none !important; }
 @media (max-width: 600px) { #map { width: 110px; height: 110px; } #place { display: none; } #card { bottom: 160px; } }
+
+#close { position: absolute; top: .5rem; right: .6rem; width: 2rem; height: 2rem; border: 0; border-radius: 50%; background: rgba(255,255,255,.14); color: #fff; font-size: 1.3rem; line-height: 1; cursor: pointer; }
+#close:hover { background: rgba(255,179,71,.55); }
+#card h2 { padding-right: 2.2rem; }
+#items .pl { font-size: .72rem; padding: .1rem .5rem; border-radius: 999px; background: rgba(107,227,255,.25); color: #bdf1ff; white-space: nowrap; }

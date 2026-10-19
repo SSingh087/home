@@ -27,7 +27,15 @@
     h3 { font: 600 .8rem 'Space Grotesk', sans-serif; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.6); margin: 1rem 0 .3rem; }
     ul { margin: .2rem 0; padding-left: 1.2rem; font-weight: 300; line-height: 1.6; }
     .links a { color: var(--gold); margin-right: 1rem; }
-    .more { margin-top: 2.5rem; }
+    .anim { margin: 1rem 0 .4rem; }
+    .anim-canvas { width: 100%; height: auto; border-radius: 12px; background: #140d26; display: block; border: 1px solid rgba(255,255,255,.12); }
+    .ctl { display: flex; flex-wrap: wrap; gap: .6rem 1.4rem; align-items: center; margin: .6rem 0 .2rem; font-size: .9rem; }
+    .ctl label { display: flex; align-items: center; gap: .4rem; color: rgba(255,255,255,.85); }
+    .ctl output { min-width: 2.6rem; color: var(--gold); }
+    .ctl input[type=range] { accent-color: var(--gold); }
+    .ctl button { padding: .3rem .8rem; border-radius: 999px; border: 1px solid rgba(255,179,71,.6); background: transparent; color: #fff; cursor: pointer; }
+    .ctl button:hover { background: rgba(255,179,71,.3); }
+    .cap { font-size: .85rem !important; color: rgba(255,255,255,.6); }
   </style>
 </head>
 <body>
@@ -35,6 +43,7 @@
   <main id="main"></main>
   <script type="module">
     import { PLACES } from '../data/places.js';
+    import { mount } from './anim.js';
     const id = new URLSearchParams(location.search).get('id'), p = PLACES[id], main = document.getElementById('main');
     const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     if (!p) {
@@ -46,10 +55,11 @@
       main.innerHTML = `<p class="kicker">${p.world === 'explorer' ? 'Education' : 'Experience'}</p><h1>${esc(p.name)}</h1>
         <p class="meta">${esc(p.country)} · ${esc(p.period)}</p><p class="lead">${esc(p.summary)}</p>
         <div class="toc">${p.items.map(i => `<a href="#${i.id}">${esc(i.title)}</a>`).join('')}</div>
-        ${p.items.map(i => `<article id="${i.id}"><h2>${esc(i.title)}</h2><p>${esc(i.summary)}</p>
+        ${p.items.map(i => `<article id="${i.id}"><h2>${esc(i.title)}</h2><p>${esc(i.summary)}</p>${i.anim ? `<div class="anim" data-anim="${i.anim}"></div>` : ''}
           ${i.points?.length ? '<h3>What it involved</h3><ul>' + i.points.map(x => `<li>${esc(x)}</li>`).join('') + '</ul>' : ''}
           ${i.related?.length ? '<h3>Related publications</h3><ul>' + i.related.map(x => `<li>${esc(x)}</li>`).join('') + '</ul>' : ''}
           ${i.links?.length ? '<h3>Read more</h3><p class="links">' + i.links.map(([t, h]) => `<a href="${h}">${esc(t)} &rarr;</a>`).join('') + '</p>' : ''}</article>`).join('')}`;
+      document.querySelectorAll('.anim').forEach(h => mount(h.dataset.anim, h));
       if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView();
     }
   </script>

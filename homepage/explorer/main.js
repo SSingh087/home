@@ -18,5 +18,5 @@ createWorld({
     { id: 'observatoire', angle: 45, dist: 23, build: observatoire },
     { id: 'glasgow', angle: 135, dist: 23, build: glasgow },
   ],
-  extras: [{ angle: 0, dist: 33, build: eiffel, scale: 0.7 }], // Paris, between the Sorbonne and the Observatoire
+  extras: [{ angle: 0, dist: 33, build: eiffel, scale: 0.75 }], // Paris, between the Sorbonne and the Observatoire
 });
