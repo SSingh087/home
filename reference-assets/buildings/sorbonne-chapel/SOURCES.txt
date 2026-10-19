@@ -1,0 +1,18 @@
+sorbonne-chapel-1.jpg
+  title: File:Paris Chapelle Sorbonne Dôme&partie façade 2014.jpg
+  author: JLPC
+
+  license: CC BY-SA 3.0
+  page: https://commons.wikimedia.org/wiki/File%3AParis_Chapelle_Sorbonne_D%C3%B4me%26partie_fa%C3%A7ade_2014.jpg
+
+sorbonne-chapel-2.jpg
+  title: File:Paris 5e - Chapelle de la Sorbonne - Dôme - Depuis la rue de Vaugirard.jpg
+  author: Romainbehar
+  license: CC0
+  page: https://commons.wikimedia.org/wiki/File%3AParis_5e_-_Chapelle_de_la_Sorbonne_-_D%C3%B4me_-_Depuis_la_rue_de_Vaugirard.jpg
+
+sorbonne-chapel-3.jpg
+  title: File:Cour d'honneur de la Sorbonne, entrée de la chapelle.jpg
+  author: Beru91
+  license: CC BY-SA 4.0
+  page: https://commons.wikimedia.org/wiki/File%3ACour_d%27honneur_de_la_Sorbonne%2C_entr%C3%A9e_de_la_chapelle.jpg

@@ -1,0 +1,17 @@
+glasgow-gilbert-scott-1.jpg
+  title: File:University of Glasgow Gilbert Scott Building - Feb 2008.jpg
+  author: Diliff
+  license: CC BY 3.0
+  page: https://commons.wikimedia.org/wiki/File%3AUniversity_of_Glasgow_Gilbert_Scott_Building_-_Feb_2008.jpg
+
+glasgow-gilbert-scott-2.jpg
+  title: File:Bell Tower, The Gilbert Scott Building, Glasgow University, Scotland, UK.jpg
+  author: Osama Shukir Muhammed Amin FRCP(Glasg)
+  license: CC BY-SA 4.0
+  page: https://commons.wikimedia.org/wiki/File%3ABell_Tower%2C_The_Gilbert_Scott_Building%2C_Glasgow_University%2C_Scotland%2C_UK.jpg
+
+glasgow-gilbert-scott-3.jpg
+  title: File:Gilbert Scott Building, September 2025.jpg
+  author: BenTanXiaoMing
+  license: CC BY-SA 4.0
+  page: https://commons.wikimedia.org/wiki/File%3AGilbert_Scott_Building%2C_September_2025.jpg

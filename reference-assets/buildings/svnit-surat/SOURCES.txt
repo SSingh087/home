@@ -1,0 +1,17 @@
+svnit-surat-1.jpg
+  title: File:SVNIT, SURAT.jpg
+  author: Imanushkasingh
+  license: CC BY-SA 4.0
+  page: https://commons.wikimedia.org/wiki/File%3ASVNIT%2C_SURAT.jpg
+
+svnit-surat-2.jpg
+  title: File:SVNIT Campus.JPG
+  author: Hemant meena
+  license: CC BY-SA 3.0
+  page: https://commons.wikimedia.org/wiki/File%3ASVNIT_Campus.JPG
+
+svnit-surat-3.jpg
+  title: File:Svnit gate.jpg
+  author: Jain.dhrj
+  license: CC BY-SA 3.0
+  page: https://commons.wikimedia.org/wiki/File%3ASvnit_gate.jpg
