@@ -10,8 +10,8 @@ createWorld({
     cloud: 0xf2b8a0, particles: 0xfff0a0, lamp: 2.2, stars: true,
   },
   places: [
-    { name: 'IIT Indore', short: 'IIT Indore', angle: 180, dist: 23, build: iitIndore, title: 'IIT Indore · Research internship', text: 'Summer 2019 (05/19): studied the effects of synthetic jet impingement and its applications, including thermal performance and its variation with the waveform.' },
-    { name: 'Max Planck Institute (AEI)', short: 'AEI', angle: 60, dist: 23, build: aei, title: 'Max Planck Institute for Gravitational Physics (AEI)', text: 'Three stints: 06/2020 LISA module for PyCBC; 07/2022 higher modes and pre-merger detection of GWs; 02/2023 Master thesis on exploring the dark sector with GW lensing.' },
-    { name: 'SYRTE · Paris Observatory', short: 'SYRTE', angle: -60, dist: 23, build: syrte, title: 'SYRTE, Observatoire de Paris', text: 'Systèmes de Référence Temps-Espace (09/2022): worked on waveform compression of EMRIs using Singular Value Decomposition.' },
+    { id: 'iit-indore', angle: 180, dist: 23, build: iitIndore },
+    { id: 'aei', angle: 60, dist: 23, build: aei },
+    { id: 'syrte', angle: -60, dist: 23, build: syrte },
   ],
 });

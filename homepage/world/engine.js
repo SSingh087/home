@@ -1,7 +1,9 @@
 // Shared miniature-world engine: fixed-angle follow camera (Q/E = 90° turns), astronaut character,
 // glowing pads that open info cards, rotating minimap.
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { buildAstronaut } from './astronaut.js';
+import { eiffel } from './props.js';
+import { PLACES, itemUrl } from '../data/places.js';
 import { M, blackHoleSculpture } from './buildings.js';
 
 const R = 40, PLAZA = 6.5, SC_B = 0.7;
@@ -58,7 +60,8 @@ export async function createWorld(cfg) {
   // ---- places
   const blobTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 64; const k = c.getContext('2d'); const g = k.createRadialGradient(32, 32, 2, 32, 32, 32);
     g.addColorStop(0, 'rgba(0,0,0,.35)'); g.addColorStop(1, 'rgba(0,0,0,0)'); k.fillStyle = g; k.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
-  const places = cfg.places.map(p => {
+  const places = cfg.places.map(pc => {
+    const D = PLACES[pc.id], p = { ...pc, ...D, build: pc.build, angle: pc.angle, dist: pc.dist };
     const a = p.angle * Math.PI / 180, x = Math.sin(a) * p.dist, z = Math.cos(a) * p.dist;
     const g = new THREE.Group(); g.position.set(x, 0, z); g.rotation.y = Math.atan2(-x, -z); g.scale.setScalar(SC_B); scene.add(g);
     const info = p.build(g, spinners);
@@ -82,8 +85,10 @@ export async function createWorld(cfg) {
     const c = document.createElement('canvas'); c.width = 640; c.height = 112; const k = c.getContext('2d');
     k.fillStyle = 'rgba(30,20,10,.78)'; k.beginPath(); k.roundRect(0, 0, 640, 112, 56); k.fill(); k.fillStyle = '#fff'; k.font = '600 52px sans-serif'; k.textAlign = 'center'; k.textBaseline = 'middle'; k.fillText(p.name, 320, 58);
     const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), depthWrite: false, fog: false })); sp.scale.set(7.5, 1.31, 1); sp.position.set(x, info.h + 1.8, z); scene.add(sp);
-    return { ...p, x, z, pad, pg, arrow, halo, group: g, spring: 0, springV: 0, active: false, short: p.short };
+    return { ...p, x, z, pad, pg, arrow, halo, group: g, spring: 0, springV: 0, active: false };
   });
+
+  (cfg.extras || []).forEach(ex => { const a = ex.angle * Math.PI / 180, g = new THREE.Group(); g.position.set(Math.sin(a) * ex.dist, 0, Math.cos(a) * ex.dist); scene.add(g); const r = ex.build(g, 0, 0, ex.scale || 1); solid(g.position.x, g.position.z, r.r); });
 
   // ---- decor: trees, bushes, lamps, benches
   const onPath = (x, z) => places.some(p => { const d = Math.hypot(p.pad.x, p.pad.z), t = (x * p.pad.x + z * p.pad.z) / d, perp = Math.abs((x * p.pad.z - z * p.pad.x) / d); return t > 0 && t < d + 3 && perp < 4; });
@@ -122,26 +127,18 @@ export async function createWorld(cfg) {
 
   // ---- player (Kenney astronaut)
   const player = { x: 0, z: PLAZA - 1, vx: 0, vz: 0, face: 0 };
-  const rig = new THREE.Group(); scene.add(rig);
-  const limbs = {};
-  try {
-    const gltf = await new GLTFLoader().loadAsync(cfg.character || '../assets/astronaut.glb');
-    const model = gltf.scene; model.traverse(o => { if (o.isMesh) o.castShadow = true; if (o.name) limbs[o.name] = o; });
-    const body = limbs.astronautA; if (body) body.position.set(0, 0, 0);
-    model.scale.setScalar(3.2); rig.add(model);
-  } catch (e) {
-    const cap = new THREE.Mesh(new THREE.CapsuleGeometry(0.5, 1, 4, 10), M(0xffffff)); cap.position.y = 1; cap.castShadow = true; rig.add(cap);
-  }
+  const { group: astro, limbs } = buildAstronaut();
+  const rig = new THREE.Group(); rig.add(astro); scene.add(rig);
   const shadowBlob = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 2.4).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false })); shadowBlob.position.y = 0.06; scene.add(shadowBlob);
 
   // ---- input
   const keys = {}, stick = { x: 0, y: 0 };
-  let camYaw = 0, camYawTarget = 0;
+  let camYaw = cfg.startYaw || 0, camYawTarget = camYaw;
   const turn = d => { camYawTarget += d * Math.PI / 2; };
   addEventListener('keydown', e => { if (e.repeat) return; keys[e.code] = true; if (e.code === 'KeyQ') turn(1); if (e.code === 'KeyE') turn(-1); });
   addEventListener('keyup', e => { keys[e.code] = false; });
   $('rotL')?.addEventListener('click', () => turn(1)); $('rotR')?.addEventListener('click', () => turn(-1));
-  let zoom = 1; canvas.addEventListener('wheel', e => { zoom = Math.max(0.7, Math.min(1.5, zoom + Math.sign(e.deltaY) * 0.08)); e.preventDefault(); }, { passive: false });
+  let zoom = 1; canvas.addEventListener('wheel', e => { zoom = Math.max(0.3, Math.min(1.5, zoom + Math.sign(e.deltaY) * 0.08)); e.preventDefault(); }, { passive: false });
   const stickEl = $('stick'), knob = $('knob');
   if (matchMedia('(pointer: coarse)').matches) {
     stickEl.hidden = false; $('rotL').hidden = $('rotR').hidden = false;
@@ -173,7 +170,15 @@ export async function createWorld(cfg) {
     mc.beginPath(); mc.moveTo(0, -8); mc.lineTo(6, 6); mc.lineTo(-6, 6); mc.closePath(); mc.fill(); mc.stroke(); mc.restore();
   }
 
-  const card = $('card');
+  const card = $('card'), list = $('items');
+  let shown = null;
+  function showCard(p) {
+    if (p === shown) return; shown = p; card.hidden = !p; if (!p) return;
+    card.querySelector('h2').textContent = p.title; card.querySelector('p').textContent = p.summary;
+    list.innerHTML = p.items.map((it, i) => `<li><a href="${itemUrl(p.id, it.id)}"><span class="n">${i + 1}</span><span>${it.title}</span><span class="go">&rarr;</span></a></li>`).join('') +
+      `<li class="all"><a href="${itemUrl(p.id)}"><span class="n">&#9733;</span><span>Open the full page</span><span class="go">&rarr;</span></a></li>`;
+  }
+  addEventListener('keydown', e => { if (!shown) return; const n = parseInt(e.key); if (n >= 1 && n <= shown.items.length) location.href = itemUrl(shown.id, shown.items[n - 1].id); else if (e.code === 'Enter') location.href = itemUrl(shown.id); });
   function resize() { const w = innerWidth, h = innerHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w / h < 0.9 ? 40 : 28; camera.updateProjectionMatrix(); }
   addEventListener('resize', resize); resize();
 
@@ -219,8 +224,8 @@ export async function createWorld(cfg) {
       p.arrow.position.y = 2.2 + Math.sin(t * 3 + i) * 0.25; p.arrow.rotation.y = t * 2;
       p.halo.scale.setScalar(1 + (on ? 0.25 : 0) + Math.sin(t * 3 + i) * 0.06);
     });
-    spinners.forEach(o => { o.rotation.y = t * 0.8; });
-    if (near) { card.hidden = false; card.querySelector('h2').textContent = near.title; card.querySelector('p').textContent = near.text; } else card.hidden = true;
+    spinners.forEach(o => { if (typeof o === 'function') o(t); else o.rotation.y = t * 0.8; });
+    showCard(near);
     const fp = flyG.attributes.position; flySeed.forEach((q, i) => fp.setXYZ(i, Math.sin(q[0] + t * 0.05 * q[4]) * q[1], q[2] + Math.sin(t * q[4] + q[3]) * 0.8, Math.cos(q[0] + t * 0.05 * q[4]) * q[1])); fp.needsUpdate = true;
     drawMap(); renderer.render(scene, camera);
   });

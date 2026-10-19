@@ -3,6 +3,7 @@
 // { r, front, h, cols } : footprint radius, z of the pad, label height, local collision circles.
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { flagpole, gem, wellington, brandenburg, eiffel } from './props.js';
 
 export const M = (c, o = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.8, metalness: 0, ...o });
 const add = (g, m, x, y, z) => { m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; g.add(m); return m; };
@@ -59,7 +60,7 @@ const clockFace = () => {
 const CREAM = 0xf0dfba, SLATE = 0x4b5563, WHITE = 0xf7f1e6, DARK = 0x2a3038;
 
 // ---------------------------------------------------------------- SVNIT Surat
-export function svnit(g) {
+export function svnit(g, sp) {
   const terra = wall({ base: '#d98a4e', line: 'rgba(120,60,20,.12)', win: '#5a3422', frame: '#f3e2c0', cols: 6, rows: 2 }, 3, 1);
   rbox(g, 14, 5, 6, 0, 0, 0, terra, 0.35);
   rbox(g, 14.5, 0.6, 6.5, 0, 5, 0, M(CREAM), 0.2);
@@ -74,11 +75,12 @@ export function svnit(g) {
   [-3.6, 3.6].forEach(x => { rbox(g, 1.2, 3.8, 1.2, x, 0, 6.6, M(CREAM), 0.2); cone(g, 0.85, 1.2, x, 3.8, 6.6, M(0xc8643a), 4).rotation.y = Math.PI / 4; });
   rbox(g, 8.6, 1, 0.6, 0, 3, 6.6, new THREE.MeshStandardMaterial({ map: label('SVNIT SURAT', 8.6, 1, '#1d2f55', '#ffffff'), roughness: 0.7 }), 0.15);
   cone(g, 1.1, 2.4, 0, 4, 6.6, M(CREAM), 4).rotation.y = Math.PI / 4;
-  return { r: 9, front: 9.8, h: 11, cols: [{ x: 0, z: 0, r: 7.5 }, { x: -6.2, z: -5.5, r: 3.8 }, { x: 6.3, z: -1.2, r: 2.6 }, { x: -3.6, z: 6.6, r: 0.9 }, { x: 3.6, z: 6.6, r: 0.9 }] };
+  const gm = gem(g, -9.5, 6.5, sp); flagpole(g, 'india', 10, 5.5, sp, 6.5);
+  return { r: 9, front: 9.8, h: 11, cols: [{ x: -9.5, z: 6.5, r: gm.r }, { x: 10, z: 5.5, r: 0.5 }, { x: 0, z: 0, r: 7.5 }, { x: -6.2, z: -5.5, r: 3.8 }, { x: 6.3, z: -1.2, r: 2.6 }, { x: -3.6, z: 6.6, r: 0.9 }, { x: 3.6, z: 6.6, r: 0.9 }] };
 }
 
 // ---------------------------------------------------------------- Sorbonne chapel
-export function sorbonne(g) {
+export function sorbonne(g, sp) {
   const stone = (cols, rows, rx = 3, ry = 1) => wall({ base: '#e9d7b0', line: 'rgba(120,95,50,.14)', win: '#3d4756', frame: '#f6ead0', cols, rows, arch: true, tall: true }, rx, ry);
   rbox(g, 16, 5.5, 5.5, 0, 0, -0.5, stone(5, 2, 3, 1), 0.3);
   rbox(g, 6.2, 7.4, 3.2, 0, 0, 3.6, stone(2, 2, 1, 1), 0.3);
@@ -92,11 +94,12 @@ export function sorbonne(g) {
   dome(g, 0.9, 0, 13.6, -0.5, M(0x3d4450));
   const green = M(0x5f9c86); rbox(g, 0.18, 1.8, 0.18, 0, 14.5, -0.5, green, 0.05); rbox(g, 0.9, 0.18, 0.18, 0, 15.5, -0.5, green, 0.05);
   const clock = clockFace(); clock.scale.setScalar(0.7); clock.position.set(0, 5.2, 5.25); g.add(clock);
-  return { r: 9.5, front: 9.2, h: 18, cols: [{ x: 0, z: -0.5, r: 8 }, { x: 0, z: 4, r: 3.4 }] };
+  flagpole(g, 'france', 10.5, 6, sp, 6);
+  return { r: 9.5, front: 9.2, h: 18, cols: [{ x: 10.5, z: 6, r: 0.5 }, { x: 0, z: -0.5, r: 8 }, { x: 0, z: 4, r: 3.4 }] };
 }
 
 // ---------------------------------------------------------------- Observatoire de Paris
-export function observatoire(g) {
+export function observatoire(g, sp) {
   const stone = wall({ base: '#e6d3a8', line: 'rgba(120,95,50,.14)', win: '#9fb0c2', frame: '#f6ead0', cols: 5, rows: 2, arch: true, tall: true }, 2, 1);
   rbox(g, 14, 6.5, 6, 0, 0, 0, stone, 0.35);
   rbox(g, 14.5, 0.5, 6.5, 0, 6.5, 0, M(0xf2e5c4), 0.15);
@@ -111,11 +114,12 @@ export function observatoire(g) {
   // iron fence
   rbox(g, 13, 0.12, 0.12, 0, 1.3, 7.2, M(0x2a3038), 0.04); rbox(g, 13, 0.12, 0.12, 0, 0.3, 7.2, M(0x2a3038), 0.04);
   for (let i = 0; i <= 13; i++) rbox(g, 0.12, 1.6, 0.12, -6.5 + i, 0, 7.2, M(0x2a3038), 0.04);
-  return { r: 9, front: 10, h: 14, cols: [{ x: 0, z: 0, r: 7.4 }, { x: 0, z: -2, r: 4.2 }] };
+  flagpole(g, 'france', -10.5, 8.5, sp, 6);
+  return { r: 9, front: 10, h: 14, cols: [{ x: -10.5, z: 8.5, r: 0.5 }, { x: 0, z: 0, r: 7.4 }, { x: 0, z: -2, r: 4.2 }] };
 }
 
 // ---------------------------------------------------------------- University of Glasgow
-export function glasgow(g) {
+export function glasgow(g, sp) {
   const red = (cols, rows, rx = 3, ry = 1, tall = true) => wall({ base: '#b8633f', line: 'rgba(60,20,10,.16)', win: '#2c2422', frame: '#e8c9a0', cols, rows, arch: true, tall }, rx, ry);
   const slate = M(0x3a4150, { roughness: 0.6 });
   rbox(g, 17, 5, 5, 0, 0, 0, red(8, 2, 2, 1), 0.3);
@@ -131,11 +135,12 @@ export function glasgow(g) {
   [[-1.8, -2.1], [1.8, -2.1], [-1.8, 1.5], [1.8, 1.5]].forEach(([x, z]) => { cyl(g, 0.32, 0.4, 2.4, x, 12.6, z, M(0xb8633f), 10); cone(g, 0.55, 1.8, x, 15, z, slate, 10); });
   cone(g, 2.1, 7, 0, 12.6, -0.3, slate, 4).rotation.y = Math.PI / 4;
   rbox(g, 0.12, 2.4, 0.12, 0, 19.4, -0.3, M(0xd8b45a), 0.03);
-  return { r: 10, front: 7.6, h: 23, cols: [{ x: 0, z: 0, r: 6.4 }, { x: -7.2, z: 0.5, r: 3.8 }, { x: 7.2, z: 0.5, r: 3.8 }] };
+  flagpole(g, 'scotland', 11.5, 5.5, sp, 7); const w = wellington(g, -10.5, 6.5);
+  return { r: 10, front: 7.6, h: 23, cols: [{ x: 11.5, z: 5.5, r: 0.5 }, { x: -10.5, z: 6.5, r: w.r }, { x: 0, z: 0, r: 6.4 }, { x: -7.2, z: 0.5, r: 3.8 }, { x: 7.2, z: 0.5, r: 3.8 }] };
 }
 
 // ---------------------------------------------------------------- IIT Indore
-export function iitIndore(g) {
+export function iitIndore(g, sp) {
   const glass = wall({ base: '#e9ecf1', line: null, win: '#4d8fa8', cols: 5, rows: 3 }, 3, 1);
   rbox(g, 14, 6, 5.5, 0, 0, -3, glass, 0.35);
   rbox(g, 14.6, 0.5, 6, 0, 6, -3, M(0xcfd5de), 0.15);
@@ -148,7 +153,8 @@ export function iitIndore(g) {
     const strut = rbox(g, 5.4, 0.25, 0.25, s * 2.6, 0, 4.6, white, 0.08); strut.position.y = 6.9; strut.rotation.z = -s * 0.28;
   });
   rbox(g, 7.6, 2.2, 0.4, 0, 0.6, 5.3, new THREE.MeshStandardMaterial({ map: label('IIT INDORE', 7.6, 2.2, '#1f4fb5', '#e8eef7'), roughness: 0.6 }), 0.12);
-  return { r: 9, front: 8, h: 10, cols: [{ x: 0, z: -3, r: 7.2 }, { x: 0, z: 4.6, r: 1 }, { x: -7.6, z: 3, r: 2.4 }, { x: 7.6, z: 3, r: 2.4 }] };
+  flagpole(g, 'india', -11, 8, sp, 6.5);
+  return { r: 9, front: 8, h: 10, cols: [{ x: -11, z: 8, r: 0.5 }, { x: 0, z: -3, r: 7.2 }, { x: 0, z: 4.6, r: 1 }, { x: -7.6, z: 3, r: 2.4 }, { x: 7.6, z: 3, r: 2.4 }] };
 }
 
 // ---------------------------------------------------------------- Max Planck Institute / AEI Hannover
@@ -175,11 +181,12 @@ export function aei(g, spinners) {
   });
   cyl(g, 0.15, 0.25, 7.6, -1, 4, 0, M(0x6b7380), 8);
   spinners.push(L);
-  return { r: 9, front: 7.6, h: 15, cols: [{ x: -1, z: 0, r: 6.8 }, { x: 8.2, z: -2.6, r: 2.2 }] };
+  const bg = brandenburg(g, -16, 4); flagpole(g, 'germany', 12.5, 6, spinners, 6.5);
+  return { r: 9, front: 7.6, h: 15, cols: [{ x: -16, z: 4, r: 4.8 }, { x: 12.5, z: 6, r: 0.5 }, { x: -1, z: 0, r: 6.8 }, { x: 8.2, z: -2.6, r: 2.2 }] };
 }
 
 // ---------------------------------------------------------------- SYRTE (time laboratory at the Observatoire de Paris)
-export function syrte(g) {
+export function syrte(g, sp) {
   rbox(g, 11, 5, 5.4, 0, 0, -1, wall({ base: '#e6d3a8', line: 'rgba(120,95,50,.14)', win: '#9fb0c2', frame: '#f6ead0', cols: 4, rows: 2, arch: true, tall: true }, 2, 1), 0.3);
   rbox(g, 11.5, 0.5, 5.9, 0, 5, -1, M(0xf2e5c4), 0.15);
   rbox(g, 3.4, 11, 3.4, 0, 0, 2.8, wall({ base: '#ead9b0', line: 'rgba(120,95,50,.14)', win: '#9fb0c2', frame: '#f6ead0', cols: 1, rows: 4, arch: true, tall: true }, 1, 1), 0.3);
@@ -189,7 +196,8 @@ export function syrte(g) {
   // dish: the atomic-clock comparison antenna
   const dish = add(g, new THREE.Mesh(new THREE.SphereGeometry(2.4, 24, 12, 0, Math.PI * 2, 0, 1.05), M(0xf1f3f5, { side: THREE.DoubleSide })), -7, 5.2, 0.5); dish.rotation.set(2.1, 0.4, 0);
   cyl(g, 0.18, 0.28, 3.4, -7, 0, 0.5, M(0x6b7380), 8);
-  return { r: 8.5, front: 7.6, h: 17, cols: [{ x: 0, z: -1, r: 6.2 }, { x: 0, z: 2.8, r: 2.4 }, { x: -7, z: 0.5, r: 1.2 }] };
+  const ei = eiffel(g, 11, -3, 0.8); flagpole(g, 'france', -10, 7, sp, 6);
+  return { r: 8.5, front: 7.6, h: 17, cols: [{ x: 11, z: -3, r: ei.r }, { x: -10, z: 7, r: 0.5 }, { x: 0, z: -1, r: 6.2 }, { x: 0, z: 2.8, r: 2.4 }, { x: -7, z: 0.5, r: 1.2 }] };
 }
 
 // ---------------------------------------------------------------- Plaza centrepiece: spinning black hole sculpture
