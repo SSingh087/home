@@ -1,0 +1,25 @@
+:root { --gold: hsl(38,100%,60%); --violet: hsl(265,100%,72%); }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #04020b; color: #fff; font-family: 'Outfit', sans-serif; overflow: hidden; }
+#scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; }
+#scene:active { cursor: grabbing; }
+
+.intro { position: fixed; left: 5vw; top: 8vh; pointer-events: none; max-width: 28rem; }
+.kicker { margin: 0; letter-spacing: .25em; text-transform: uppercase; font-size: .75rem; color: var(--gold); }
+h1 { margin: .2em 0; font: 600 clamp(2.2rem, 6vw, 4.5rem)/1 'Space Grotesk', sans-serif;
+     background: linear-gradient(90deg, #fff, var(--violet)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.sub { margin: 0; color: rgba(255,255,255,.65); font-weight: 300; }
+
+.orb { position: fixed; left: 0; top: 0; padding: .5rem 1rem; border-radius: 999px; white-space: nowrap;
+       color: #fff; text-decoration: none; font: 400 .9rem 'Space Grotesk', sans-serif;
+       background: rgba(30,18,60,.55); border: 1px solid rgba(255,255,255,.18); backdrop-filter: blur(8px);
+       transition: background .25s, border-color .25s, box-shadow .25s; will-change: transform, opacity; }
+.orb:hover, .orb:focus-visible { background: rgba(255,170,40,.28); border-color: var(--gold); box-shadow: 0 0 24px rgba(255,170,40,.5); outline: none; }
+
+.links { position: fixed; right: 5vw; bottom: 5vh; display: flex; gap: 1.2rem; }
+.links a { color: rgba(255,255,255,.7); text-decoration: none; font-size: .9rem; letter-spacing: .08em; }
+.links a:hover { color: var(--gold); }
+.hint { position: fixed; left: 5vw; bottom: 5vh; font-size: .75rem; color: rgba(255,255,255,.35); letter-spacing: .1em; }
+
+@media (max-width: 600px) { .intro { top: 5vh; } .hint { display: none; } }
+@media (prefers-reduced-motion: reduce) { .orb { transition: none; } }
