@@ -193,7 +193,7 @@ class App extends React.Component {
       React.createElement("h1", null, "नमस्ते !"), /*#__PURE__*/
       React.createElement("p", null, "I am Shashwat Singh Ph.D. at ", React.createElement("a", { href: "https://www.gla.ac.uk/" }, "University of Glasgow"), " in the ", React.createElement("a", { href: "https://www.gla.ac.uk/schools/physics/" }, "School of Physics and Astronomy"), ". I am a member of the ", React.createElement("a", {href:"https://www.gla.ac.uk/schools/physics/research/groups/igr/"}, "IGR"), " group, where we are unveiling cosmic mysteries using ", React.createElement("a", { href: "https://medium.com/@SSingh087/gravitational-waves-a-non-mathematical-introduction-i-129c4dda1cdc" }, "Gravitational Waves"), ", which is the primary area of my research. I work under the supervision of ", React.createElement("a", { href: "https://cplberry.com/" }, "Dr. Chritopher Berry"), " and ", React.createElement("a", { href: "https://www.physics.gla.ac.uk/igr/index.php?L1=members&L2=member&name=jveitch"}, "Dr. John Veitch"), " focusing on revealing the family of massive black holes with LISA. Feel free to explore my ", React.createElement("a", { href: "./research/index.html"}, "research")," and ", React.createElement("a", { href: "mailto:s.singh.3@research.gla.ac.uk?subject=Inquiry on research"}, "nudge me"), " in any case."),
 
-      React.createElement("p", null, "Beyond the academic realm, I co-founded ", React.createElement("a", { href: "https://www.bosex.org/"}, "Bose.X"), ", a research group dedicated to supporting and promoting undergraduate research. I also started a blog/educational channel - ", React.createElement("a", { href: "./nonac/grawitty/Grawitty-loader.html"}, "GRA-WITTY"), " where I aim to share latest updates on astrophysics and explain academic articles. If you would like to contribute to this endeavor feel free to ", React.createElement("a", { href: ".mailto:s.singh.3@research.gla.ac.uk?subject=Inquiry on Grawitty"}, "contact"),  " me."),
+      React.createElement("p", null, "Beyond the academic realm, I co-founded ", React.createElement("a", { href: "https://www.bosex.org/"}, "Bose.X"), ", a research group dedicated to supporting and promoting undergraduate research. I also started a blog/educational channel - ", React.createElement("a", { href: "./nonac/grawitty/Grawitty-loader.html"}, "GRA-WITTY"), " where I aim to share latest updates on astrophysics and explain academic articles. If you would like to contribute to this endeavor feel free to ", React.createElement("a", { href: "mailto:s.singh.3@research.gla.ac.uk?subject=Inquiry on Grawitty"}, "contact"),  " me."),
 
       React.createElement("p", null, "Check out my drawer where I keep my social connections  ....")), /*#__PURE__*/
 
@@ -324,13 +324,10 @@ const Grabber = ({ state, gameOver, extended, onCursorGrabbed }) => {
 // Render app
 ReactDOM.render( /*#__PURE__*/React.createElement(App, null), document.getElementById("app"));
 
-var img = document.createElement('img');
-
-// Set the source and alt attributes of the image
-img.src = 'ReadyPlayerMe-Avatar.png';
-
-// Find the container element where you want to append the image
+// Optional avatar: only added if the page has an #imageContainer (it currently does not)
 var container = document.getElementById('imageContainer');
-
-// Append the image to the container
-container.appendChild(img);
+if (container) {
+  var img = document.createElement('img');
+  img.src = 'ReadyPlayerMe-Avatar.png';
+  container.appendChild(img);
+}

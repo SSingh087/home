@@ -80,7 +80,7 @@ async function boot() {
       sets.push({ label: 'lo90', data: ser(g('q05')), borderWidth: 0, pointRadius: 0, fill: false }, { label: '90%', data: ser(g('q95')), borderWidth: 0, pointRadius: 0, fill: '-1', backgroundColor: rgba(col, .12) },
         { label: 'lo68', data: ser(g('q16')), borderWidth: 0, pointRadius: 0, fill: false }, { label: '68%', data: ser(g('q84')), borderWidth: 0, pointRadius: 0, fill: '-1', backgroundColor: rgba(col, .26) },
         { label: d.name + ' median', data: ser(g('q50')), borderColor: col, backgroundColor: col, borderWidth: 2, pointRadius: 0, pointHitRadius: 6 }); });
-    chDyn.data.datasets = sets; chDyn.options.scales.y.title.text = P.label; chDyn.options.scales.y.type = P.log ? 'logarithmic' : 'linear'; chDyn.update(); $('dynNote').textContent = P.note;
+    chDyn.data.datasets = sets; chDyn.options.scales.y.title.text = P.label; chDyn.options.scales.y.type = P.log ? 'logarithmic' : 'linear'; chDyn.update(); $('dynNote').textContent = P.note + ' Interval widths are illustrative: the observation noise in these fits is a placeholder, so they are not calibrated to market microstructure.';
   }
   $('selParam').onchange = e => { S.param = e.target.value; drawDyn(); };
   document.querySelectorAll('#segD button').forEach(b => b.onclick = () => { S.dyn = b.dataset.c; document.querySelectorAll('#segD button').forEach(x => x.classList.toggle('on', x === b)); drawDyn(); });

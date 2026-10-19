@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" href="data:,">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shashwat Singh | Experience</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
@@ -11,6 +12,14 @@
   </script>
 </head>
 <body>
+  <div id="unsupported" hidden style="position:fixed;inset:0;z-index:99;display:grid;place-items:center;padding:1.5rem;text-align:center;background:#140d26;color:#fff;font-family:sans-serif"><div><h2>This 3D page needs a newer browser</h2><p>It uses WebGL and JavaScript modules. Try a recent Chrome, Firefox, Edge or Safari (16.4+), or use the <a style="color:#ffb347" href="../classic.html">standard site</a>.</p></div></div>
+  <script>
+    (function () {
+      var ok = window.HTMLScriptElement && HTMLScriptElement.supports && HTMLScriptElement.supports('importmap');
+      try { var c = document.createElement('canvas'); ok = ok && !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { ok = false; }
+      if (!ok) document.getElementById('unsupported').hidden = false;
+    })();
+  </script>
   <canvas id="scene"></canvas>
   <a id="back" class="chip" href="../index.html">&larr; Back</a>
   <div id="place" class="chip">Experience planet</div>
