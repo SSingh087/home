@@ -16,8 +16,8 @@
 
   <header class="hero">
     <p class="kicker">Quantitative research project</p>
-    <h1>Commodity term structures, inferred like gravitational waves</h1>
-    <p class="lead">I took the hierarchical Bayesian population-inference machinery I use for gravitational-wave astrophysics and applied it to gold and Brent futures: a neural surrogate of the Schwartz&ndash;Smith two-factor model, nested sampling on every trading day, and a population layer that pools the days. Everything below is computed from the real fits and is interactive.</p>
+    <h1>Commodity term structures, inferred with hierarchical Bayesian models</h1>
+    <p class="lead">A hierarchical Bayesian framework for gold and Brent futures: a neural-network surrogate of the Schwartz&ndash;Smith two-factor model, nested sampling on every trading day, and a population layer that pools the days. Everything below is computed from the real fits and is interactive.</p>
     <div class="kpis" id="kpis"></div>
   </header>
 
@@ -61,8 +61,8 @@
       <h3>Surrogate vs the analytic model</h3>
       <div class="split two"><div class="chartbox"><canvas id="chSurErr"></canvas></div><div class="chartbox"><canvas id="chSurScatter"></canvas></div></div>
       <div class="chips" id="surChips"></div>
-      <h3>Injection&ndash;recovery calibration (PP plots)</h3>
-      <p class="sub">For each of 70 synthetic injections, where did the true value fall inside its own posterior? A calibrated method gives a diagonal line; the shaded band is the 95% envelope expected from only 70 injections.</p>
+      <h3>Calibration on simulated data (PP plots)</h3>
+      <p class="sub">For each of 70 simulated curves with known parameters, where did the true value fall inside its own posterior? A calibrated method gives a diagonal line; the shaded band is the 95% envelope expected from only 70 injections.</p>
       <div class="toolbar"><select id="selRun"></select><span id="runInfo" class="note"></span></div>
       <div class="split two"><div class="chartbox tall"><canvas id="chPP"></canvas></div><div class="side" id="ppSide"></div></div>
     </section>
@@ -80,7 +80,7 @@
       <div class="two-col">
         <div><h3>What this is</h3><ul>
           <li>A working end-to-end Bayesian pipeline: simulation, surrogate, calibration, per-day inference, population inference, real data.</li>
-          <li>A method transfer: the same hierarchical population-inference approach used for gravitational-wave populations, applied to a financial term structure.</li>
+          <li>A research-grade workflow: simulate, validate, calibrate, and only then fit real data, with each stage checked before the next is trusted.</li>
           <li>Reproducible on a cluster: one HTCondor job per day, with a DAG linking the layers.</li></ul></div>
         <div><h3>What it is not (yet)</h3><ul>
           <li>The Schwartz&ndash;Smith forward curve has a closed form, so here the surrogate is a validated stand-in. Its real payoff is for products without one, such as options on futures priced by Monte Carlo, which is the natural next step.</li>

@@ -28,11 +28,11 @@ async function boot() {
 
   // ---- KPIs and pipeline
   const nDays = gold.dates.length + brent.dates.length, goodRuns = cal.runs.filter(r => Object.values(r.ks).every(v => v < cal.dkw95)).length;
-  $('kpis').innerHTML = [[nDays, 'daily forward curves fitted (gold + Brent)'], ['8', 'model parameters inferred per day, with full posteriors'], [`${sur.overall.median.toFixed(3)}%`, `median surrogate error vs the analytic model (99th pct ${sur.overall.p99.toFixed(2)}%)`], [`${goodRuns}/${cal.runs.length}`, 'training configurations with every parameter inside the 95% calibration envelope'], [`${cal.hyper.n_covered}/${cal.hyper.n_total}`, 'population hyperparameters recovered in a synthetic injection test']]
+  $('kpis').innerHTML = [[nDays, 'daily forward curves fitted (gold + Brent)'], ['8', 'model parameters inferred per day, with full posteriors'], [`${sur.overall.median.toFixed(3)}%`, `median surrogate error vs the analytic model (99th pct ${sur.overall.p99.toFixed(2)}%)`], [`${goodRuns}/${cal.runs.length}`, 'training configurations with every parameter inside the 95% calibration envelope'], [`${cal.hyper.n_covered}/${cal.hyper.n_total}`, 'population hyperparameters recovered in a simulated-data test']]
     .map(([a, b]) => `<div class="kpi"><b>${a}</b><span>${b}</span></div>`).join('');
   $('stages').innerHTML = [
     ['#validation', 'Train a surrogate', 'An MLP (64-128-128-64, GELU) trained on 500,000 simulated Schwartz–Smith forward curves maps the 8 parameters to the curve at 11 maturities.'],
-    ['#validation', 'Check calibration', 'Injection–recovery on synthetic data with known truth: PP plots and coverage across 13 training configurations before trusting any posterior.'],
+    ['#validation', 'Check calibration', 'Recovery tests on simulated data with known truth: PP plots and coverage across 13 training configurations before trusting any posterior.'],
     ['#dynamics', 'Infer hierarchically', 'Layer 1: nested sampling (nessai) per trading day. Layer 2: a population hyper-distribution pooled over the days, per commodity.'],
     ['#backtest', 'Run on real markets', 'Real gold and Brent futures chains, with a masked likelihood that compares the model only at maturities that actually trade.'],
   ].map(([h, t, p], i) => `<a class="card" href="${h}"><span class="n">${i + 1}</span><h4>${t}</h4><p>${p}</p></a>`).join('');
@@ -116,17 +116,17 @@ async function boot() {
   const runLabel = r => r.kind === 'ensemble' ? `Ensemble of ${r.ens} · batch ${r.batch}, lr ${r.lr}, wd ${r.wd}` : `Single net · batch ${r.batch}, α=β=${r.alpha}, lr ${r.lr}, wd ${r.wd}`;
   $('selRun').innerHTML = cal.runs.map((r, i) => `<option value="${i}">${runLabel(r)}  (KS ${r.mean_ks})</option>`).join('');
   const PPC = { kappa: '#ffc247', mu_xi: '#8be28b', sigma_chi: '#5ab0ff', sigma_xi: '#ff7ab8', rho: '#c39bff', lambda_chi: '#ff9d5c' }, PPN = { kappa: 'κ', mu_xi: 'μξ', sigma_chi: 'σχ', sigma_xi: 'σξ', rho: 'ρ', lambda_chi: 'λχ' };
-  const chPP = new Chart($('chPP'), { type: 'line', data: { datasets: [] }, options: { parsing: false, scales: { x: { type: 'linear', min: 0, max: 1, title: { display: true, text: 'credible level p' } }, y: { min: 0, max: 1, title: { display: true, text: 'fraction of injections with truth below p' } } }, plugins: { legend: { labels: { filter: i => !/^(lo|band)/.test(i.text) } } } } });
+  const chPP = new Chart($('chPP'), { type: 'line', data: { datasets: [] }, options: { parsing: false, scales: { x: { type: 'linear', min: 0, max: 1, title: { display: true, text: 'credible level p' } }, y: { min: 0, max: 1, title: { display: true, text: 'fraction of simulated curves with truth below p' } } }, plugins: { legend: { labels: { filter: i => !/^(lo|band)/.test(i.text) } } } } });
   function drawPP() {
     const r = cal.runs[+$('selRun').value], g = cal.grid, e = cal.dkw95, sets = [];
     sets.push({ label: 'lo', data: g.map(p => ({ x: p, y: Math.max(0, p - e) })), borderWidth: 0, pointRadius: 0, fill: false }, { label: 'band', data: g.map(p => ({ x: p, y: Math.min(1, p + e) })), borderWidth: 0, pointRadius: 0, fill: '-1', backgroundColor: 'rgba(255,255,255,.1)' },
       { label: 'ideal', data: [{ x: 0, y: 0 }, { x: 1, y: 1 }], borderColor: 'rgba(255,255,255,.6)', borderDash: [5, 4], borderWidth: 1.2, pointRadius: 0 });
     Object.keys(PPC).forEach(p => { if (r.pp[p]) sets.push({ label: PPN[p], data: g.map((x, i) => ({ x, y: r.pp[p][i] })), borderColor: PPC[p], borderWidth: 1.8, pointRadius: 0 }); });
     chPP.data.datasets = sets; chPP.update();
-    $('runInfo').textContent = `${r.n} injections`;
+    $('runInfo').textContent = `${r.n} simulated curves`;
     $('ppSide').innerHTML = `<h4>This configuration</h4><table><tr><td>mean KS distance</td><td>${f(r.mean_ks, 3)}</td></tr><tr><td>95% envelope (n=${r.n})</td><td>±${f(cal.dkw95, 3)}</td></tr>${Object.keys(PPC).filter(p => r.ks[p] != null).map(p => `<tr><td>${PPN[p]}  max deviation</td><td style="color:${r.ks[p] < cal.dkw95 ? COL.green : COL.red}">${f(r.ks[p], 3)}</td></tr>`).join('')}</table>
       <p class="note">Green: that parameter&rsquo;s curve stays inside the 95% envelope. Several parameters sit close to the edge, so I treat calibration as good but not perfect.</p>
-      <h4 style="margin-top:1rem">Population hyperparameters</h4><p class="note">Recovered in a synthetic injection test: <b style="color:#fff">${cal.hyper.n_covered} of ${cal.hyper.n_total}</b> inside their 90% interval.</p>`;
+      <h4 style="margin-top:1rem">Population hyperparameters</h4><p class="note">Recovered in a simulated-data test: <b style="color:#fff">${cal.hyper.n_covered} of ${cal.hyper.n_total}</b> inside their 90% interval.</p>`;
   }
   $('selRun').onchange = drawPP; drawPP();
 
