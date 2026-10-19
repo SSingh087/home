@@ -1,0 +1,17 @@
+observatoire-de-paris-1.jpg
+  title: File:Paris Observatory, North view 20140209 1.jpg
+  author: DXR
+  license: CC BY-SA 3.0
+  page: https://commons.wikimedia.org/wiki/File%3AParis_Observatory%2C_North_view_20140209_1.jpg
+
+observatoire-de-paris-2.jpg
+  title: File:Observatoire de Paris, 24 January 2016.jpg
+  author: Guilhem Vellut from Paris, France
+  license: CC BY 2.0
+  page: https://commons.wikimedia.org/wiki/File%3AObservatoire_de_Paris%2C_24_January_2016.jpg
+
+observatoire-de-paris-3.jpg
+  title: File:Paris Observatory - Arago dome.jpg
+  author: Valhallasw
+  license: CC BY-SA 3.0
+  page: https://commons.wikimedia.org/wiki/File%3AParis_Observatory_-_Arago_dome.jpg

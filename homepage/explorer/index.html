@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" href="data:,">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shashwat Singh | Education</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../world/world.css">
+  <script type="importmap">
+    { "imports": { "three": "../vendor/three/build/three.module.js", "three/addons/": "../vendor/three/addons/" } }
+  </script>
+</head>
+<body>
+  <div id="unsupported" hidden style="position:fixed;inset:0;z-index:99;display:grid;place-items:center;padding:1.5rem;text-align:center;background:#140d26;color:#fff;font-family:sans-serif"><div><h2>This 3D page needs a newer browser</h2><p>It uses WebGL and JavaScript modules. Try a recent Chrome, Firefox, Edge or Safari (16.4+), or use the <a style="color:#ffb347" href="../classic.html">standard site</a>.</p></div></div>
+  <script>
+    (function () {
+      var ok = window.HTMLScriptElement && HTMLScriptElement.supports && HTMLScriptElement.supports('importmap');
+      try { var c = document.createElement('canvas'); ok = ok && !!(c.getContext('webgl2') || c.getContext('webgl')); } catch (e) { ok = false; }
+      if (!ok) document.getElementById('unsupported').hidden = false;
+    })();
+  </script>
+  <canvas id="scene"></canvas>
+  <a id="back" class="chip" href="../index.html">&larr; Back</a>
+  <div id="place" class="chip">Education island</div>
+  <a id="other" class="chip" href="../experience/index.html">Experience planet &rarr;</a>
+  <canvas id="map" width="180" height="180"></canvas>
+  <div id="card" hidden><button id="close" aria-label="Close" title="Close (Esc)">&times;</button><h2></h2><p></p><ul id="items"></ul><div class="tip">Click an item, or press its number &middot; Enter opens the full page</div></div>
+  <div id="start">
+    <h1>Education island</h1>
+    <p>One landmark for each place I studied: SVNIT, Sorbonne, the Paris Observatory and Glasgow.</p>
+    <p class="keys">WASD / arrows to walk &middot; Q / E to turn the view &middot; Shift to run &middot; step on a glowing pad</p>
+    <button id="go">Start exploring</button>
+  </div>
+  <div id="stick" hidden><div id="knob"></div></div>
+  <button id="rotL" class="rot" hidden aria-label="Rotate left">&#8634;</button>
+  <button id="rotR" class="rot" hidden aria-label="Rotate right">&#8635;</button>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

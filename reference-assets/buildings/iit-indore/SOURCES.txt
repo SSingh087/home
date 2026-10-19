@@ -1,0 +1,17 @@
+iit-indore-1.jpg
+  title: File:Entrance of IIT Indore.jpg
+  author: MysticHues
+  license: CC BY-SA 4.0
+  page: https://commons.wikimedia.org/wiki/File%3AEntrance_of_IIT_Indore.jpg
+
+iit-indore-2.jpg
+  title: File:The learning resource center at IIT Indore, Madhya Pradesh.jpg
+  author: Annni07
+  license: CC BY-SA 3.0
+  page: https://commons.wikimedia.org/wiki/File%3AThe_learning_resource_center_at_IIT_Indore%2C_Madhya_Pradesh.jpg
+
+iit-indore-3.jpg
+  title: File:PACL Campus, IIT Indore.jpg
+  author: Cengelboles
+  license: CC BY-SA 3.0
+  page: https://commons.wikimedia.org/wiki/File%3APACL_Campus%2C_IIT_Indore.jpg
