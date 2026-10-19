@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shashwat Singh | Explorer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./explorer.css">
+  <script type="importmap">
+    { "imports": { "three": "../vendor/three/build/three.module.js" } }
+  </script>
+</head>
+<body>
+  <canvas id="scene"></canvas>
+  <a id="back" href="../index.html">&larr; Back</a>
+  <div id="place">SVNIT, Surat</div>
+  <div id="card" hidden><h2></h2><p></p></div>
+  <div id="start">
+    <h1>Walk through SVNIT</h1>
+    <p>A stylised model of the campus. Follow the path and stop at the glowing markers.</p>
+    <p class="keys">WASD / arrows to walk &middot; drag to look &middot; Shift to run</p>
+    <button id="go">Start walking</button>
+  </div>
+  <div id="stick" hidden><div id="knob"></div></div>
+  <script type="module" src="./explorer.js"></script>
+</body>
+</html>
