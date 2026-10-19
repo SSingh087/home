@@ -10,10 +10,13 @@ h1 { margin: .2em 0; font: 600 clamp(2.2rem, 6vw, 4.5rem)/1 'Space Grotesk', san
      background: linear-gradient(90deg, #fff, var(--violet)); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .sub { margin: 0; color: rgba(255,255,255,.65); font-weight: 300; }
 
-.orb { position: fixed; left: 0; top: 0; padding: .5rem 1rem; border-radius: 999px; white-space: nowrap;
+#orbs { position: fixed; right: 5vw; top: 8vh; display: flex; flex-direction: column; gap: .6rem; z-index: 5; }
+body.live #orbs { position: static; display: block; }
+.orb { display: block; padding: .5rem 1rem; border-radius: 999px; white-space: nowrap;
        color: #fff; text-decoration: none; font: 400 .9rem 'Space Grotesk', sans-serif;
        background: rgba(30,18,60,.55); border: 1px solid rgba(255,255,255,.18); backdrop-filter: blur(8px);
        transition: background .25s, border-color .25s, box-shadow .25s; will-change: transform, opacity; }
+body.live .orb { position: fixed; left: 0; top: 0; }
 .orb:hover, .orb:focus-visible { background: rgba(255,170,40,.28); border-color: var(--gold); box-shadow: 0 0 24px rgba(255,170,40,.5); outline: none; }
 
 .links { position: fixed; right: 5vw; bottom: 5vh; display: flex; gap: 1.2rem; }
