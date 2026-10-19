@@ -119,6 +119,18 @@
     });
   });
 </script>
+  <script>
+    // "Back to Home" returns to whichever home the visitor came from: the classic page or the 3D page.
+    (function () {
+      var a = document.querySelector('a.nav-back-button'); if (!a) return;
+      try {
+        var ref = document.referrer, k = 'homeTarget';
+        if (/\/classic\.html/.test(ref)) sessionStorage.setItem(k, '../classic.html');
+        else if (/\/homepage\/(index\.html)?$/.test(ref.split('?')[0].split('#')[0])) sessionStorage.setItem(k, '../index.html');
+        var t = sessionStorage.getItem(k); if (t) a.setAttribute('href', t);
+      } catch (e) {}
+    })();
+  </script>
 </body>
 </html>
 
