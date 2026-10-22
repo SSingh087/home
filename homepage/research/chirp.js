@@ -4,7 +4,7 @@
   var canvas = document.getElementById('chirp-canvas');
   if (!btn || !canvas) return;
 
-  var RATE = 22050, T = 4, TOTAL = 5, F0 = 35, FMAX = 480;
+  var RATE = 22050, T = 0.2, TOTAL = 0.7, F0 = 50, FMAX = 350;
   var samples = null;
 
   function build() {
@@ -19,10 +19,10 @@
       } else {
         // ringdown: fixed frequency, exponential decay
         f = FMAX;
-        amp = Math.exp(-(t - tc) * 9);
+        amp = Math.exp(-(t - tc) * 20);
       }
       phase += 2 * Math.PI * f / RATE;
-      var fade = Math.min(1, t * 20);
+      var fade = Math.min(1, t * 200);
       out[i] = 0.5 * amp * fade * Math.sin(phase);
     }
     return out;
@@ -35,13 +35,17 @@
     var ctx = canvas.getContext('2d');
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
-    var step = Math.floor(samples.length / w);
-    for (var x = 0; x < w; x++) {
-      var peak = 0;
-      for (var j = 0; j < step; j += 8) peak = Math.max(peak, Math.abs(samples[x * step + j]));
-      var played = x / w <= progress;
-      ctx.fillStyle = played ? 'hsl(38,100%,55%)' : 'rgba(120,190,255,0.55)';
-      ctx.fillRect(x, h / 2 - peak * h * 0.9, 1, Math.max(1, peak * h * 1.8));
+    var n = samples.length, split = Math.floor(progress * n);
+    for (var pass = 0; pass < 2; pass++) {
+      ctx.beginPath();
+      var lo = pass ? split : 0, hi = pass ? n : split;
+      for (var i = lo; i < hi; i += 2) {
+        var x = i / n * w, y = h / 2 - samples[i] * h * 1.6;
+        i === lo ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = pass ? 'rgba(120,190,255,0.7)' : 'hsl(38,100%,55%)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
     }
   }
 
