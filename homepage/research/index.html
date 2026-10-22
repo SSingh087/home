@@ -25,6 +25,11 @@
     <div class="ag-timeline_tagline">Research</div>
   </div>
 </div>
+<div class="chirp-box">
+  <button id="chirp-play" type="button">▶ Hear a black hole merger</button>
+  <canvas id="chirp-canvas" aria-label="Waveform of a simulated binary merger"></canvas>
+  <p class="chirp-note">Simulated inspiral, merger and ringdown, shifted into audible range.</p>
+</div>
 <!-- partial:index.partial.html -->
 <section class="hero-section">
   <div class="card-grid">
@@ -95,6 +100,7 @@
 
 </section>
 
+<script src="./chirp.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const links = document.querySelectorAll("a[href^='#']");

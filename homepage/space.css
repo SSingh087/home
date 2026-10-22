@@ -26,3 +26,11 @@ body.live .orb { position: fixed; left: 0; top: 0; }
 
 @media (max-width: 600px) { .intro { top: 5vh; } .hint { display: none; } }
 @media (prefers-reduced-motion: reduce) { .orb { transition: none; } }
+
+#palette { position: fixed; inset: 0; z-index: 50; display: flex; justify-content: center; align-items: flex-start; padding-top: 18vh; background: rgba(5, 2, 12, 0.6); }
+#palette[hidden] { display: none; }
+.pal-card { width: min(420px, 90vw); background: rgba(20, 10, 40, 0.95); border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 12px; overflow: hidden; }
+.pal-card input { width: 100%; box-sizing: border-box; padding: 14px 16px; background: transparent; border: 0; border-bottom: 1px solid rgba(255, 255, 255, 0.15); color: #fff; font: 400 16px 'Outfit', sans-serif; outline: none; }
+.pal-card ul { list-style: none; margin: 0; padding: 6px; }
+.pal-card li { padding: 10px 12px; border-radius: 8px; color: #fff; cursor: pointer; font: 400 15px 'Outfit', sans-serif; }
+.pal-card li.on, .pal-card li:hover { background: rgba(255, 194, 71, 0.2); }
