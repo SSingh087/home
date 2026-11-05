@@ -82,25 +82,8 @@ export function svnit(g, sp, o = {}) {
 // Sorbonne chapel lives in sorbonne.js (detailed masonry build)
 export { sorbonne } from './sorbonne.js';
 
-// ---------------------------------------------------------------- Observatoire de Paris
-export function observatoire(g, sp, o = {}) {
-  const stone = wall({ base: '#e6d3a8', line: 'rgba(120,95,50,.14)', win: '#9fb0c2', frame: '#f6ead0', cols: 5, rows: 2, arch: true, tall: true }, 2, 1);
-  rbox(g, 14, 6.5, 6, 0, 0, 0, stone, 0.35);
-  rbox(g, 14.5, 0.5, 6.5, 0, 6.5, 0, M(0xf2e5c4), 0.15);
-  rbox(g, 5.5, 7.6, 3, 0, 0, 3.2, wall({ base: '#ead9b0', line: 'rgba(120,95,50,.14)', win: '#9fb0c2', frame: '#f6ead0', cols: 2, rows: 2, arch: true, tall: true }, 1, 1), 0.3);
-  prism(g, 6.2, 1.5, 3.4, 0, 7.6, 3.2, M(0xf2e5c4));
-  const clock = clockFace(); clock.scale.setScalar(0.9); clock.position.set(0, 8.2, 4.75); g.add(clock);
-  const white = M(0xf1f3f5, { roughness: 0.5 }), rib = M(0xc9ced4);
-  // corner towers with white domes, and a larger central dome behind (the telescope domes in the photos)
-  [-6.2, 6.2].forEach(x => { rbox(g, 3.6, 8.4, 3.6, x, 0, -1.5, M(0xe6d3a8), 0.3); dome(g, 2.1, x, 8.4, -1.5, white); ribs(g, 2.12, 6, x, 8.4, -1.5, rib); });
-  cyl(g, 3, 3, 2.2, 0, 6.5, -2.2, M(0xe6d3a8)); dome(g, 3.2, 0, 8.7, -2.2, white); ribs(g, 3.22, 8, 0, 8.7, -2.2, rib);
-  rbox(g, 0.9, 3.4, 0.5, 0, 9, 0.4, M(0x20252b), 0.1).rotation.x = -0.5; // observing slit
-  // iron fence
-  rbox(g, 13, 0.12, 0.12, 0, 1.3, 7.2, M(0x2a3038), 0.04); rbox(g, 13, 0.12, 0.12, 0, 0.3, 7.2, M(0x2a3038), 0.04);
-  for (let i = 0; i <= 13; i++) rbox(g, 0.12, 1.6, 0.12, -6.5 + i, 0, 7.2, M(0x2a3038), 0.04);
-  const P = []; if (o.props !== false) { flagpole(g, 'france', -8, 8.8, sp, 6); P.push({ x: -8, z: 8.8, r: 0.5, prop: true }); }
-  return { r: 9, front: 10, h: 14, cols: [...P, { x: 0, z: 0, r: 7.4 }, { x: 0, z: -2, r: 4.2 }] };
-}
+// Observatoire de Paris lives in observatoire.js (detailed masonry build)
+export { observatoire } from './observatoire.js';
 
 // University of Glasgow lives in glasgow.js (detailed masonry build)
 export { glasgow } from './glasgow.js';
