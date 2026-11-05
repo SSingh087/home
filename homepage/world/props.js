@@ -21,7 +21,7 @@ export function flagpole(g, kind, x, z, animators, h = 7) {
   cyl(g, 0.09, 0.12, h, x, 0, z, std(0xd8d8e0, { metalness: 0.5 }), 8);
   put(g, new THREE.Mesh(new THREE.SphereGeometry(0.18, 10, 8), std(0xffd25a, { metalness: 0.6 })), x, h + 0.1, z);
   const geo = new THREE.PlaneGeometry(3.2, 2.1, 16, 4), base = geo.attributes.position.array.slice();
-  const flag = put(g, new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: flagTex(kind), side: THREE.DoubleSide, roughness: 0.9 })), x + 1.7, h - 1.1, z);
+  const flag = put(g, new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: flagTex(kind), side: THREE.DoubleSide, roughness: 0.9 })), x + 1.7, h - 1.1, z); flag.castShadow = false;   // waves every frame; would force a shadow refresh
   animators.push(t => { const p = geo.attributes.position; for (let i = 0; i < p.count; i++) { const bx = base[i * 3] + 1.6; p.setZ(i, Math.sin(bx * 1.6 - t * 4) * 0.22 * (bx / 3.2)); } p.needsUpdate = true; });
 }
 

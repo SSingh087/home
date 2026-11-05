@@ -15,6 +15,7 @@ export async function createWorld(cfg) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.autoUpdate = false;   // the sun never moves: re-render shadows only when a caster moves (see loop)
   renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = T.exposure ?? 1.05;
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(28, 1, 1, 400);
@@ -126,7 +127,7 @@ export async function createWorld(cfg) {
   });
 
   // ---- player (Kenney astronaut)
-  const player = { x: 0, z: PLAZA - 1, vx: 0, vz: 0, face: 0 };
+  const player = { x: 0, z: PLAZA - 1, vx: 0, vz: 0, face: 0, y: 0, vy: 0 };
   const { group: astro, limbs } = buildAstronaut();
   const rig = new THREE.Group(); rig.add(astro); scene.add(rig);
   const shadowBlob = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 2.4).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false })); shadowBlob.position.y = 0.06; scene.add(shadowBlob);
@@ -137,6 +138,11 @@ export async function createWorld(cfg) {
   const turn = d => { camYawTarget += d * Math.PI / 2; };
   addEventListener('keydown', e => { if (e.repeat) return; keys[e.code] = true; if (e.code === 'KeyQ') turn(1); if (e.code === 'KeyE') turn(-1); });
   addEventListener('keyup', e => { keys[e.code] = false; });
+  // Space = a small hop (ignored while a button/link/input has focus, so it never fights the UI)
+  addEventListener('keydown', e => {
+    if (e.code !== 'Space' || e.repeat || /^(BUTTON|A|INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    e.preventDefault(); if (player.y === 0) player.vy = 8;
+  });
   $('rotL')?.addEventListener('click', () => turn(1)); $('rotR')?.addEventListener('click', () => turn(-1));
   let zoom = 1; canvas.addEventListener('wheel', e => { zoom = Math.max(0.3, Math.min(1.5, zoom + Math.sign(e.deltaY) * 0.08)); e.preventDefault(); }, { passive: false });
   const stickEl = $('stick'), knob = $('knob');
@@ -186,7 +192,7 @@ export async function createWorld(cfg) {
   addEventListener('resize', resize); resize();
 
   // ---- loop
-  const clock = new THREE.Clock(), look = new THREE.Vector3(), camPos = new THREE.Vector3(); let walk = 0;
+  const clock = new THREE.Clock(), look = new THREE.Vector3(), camPos = new THREE.Vector3(); let walk = 0, frames = 0;
   const ELEV = 0.62, DIST = 84;
   renderer.setAnimationLoop(() => {
     const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
@@ -209,8 +215,11 @@ export async function createWorld(cfg) {
     walk += dt * speed * 1.4;
     const amp = Math.min(1, speed / 8) * 0.9;
     if (limbs.armLeft) { limbs.armLeft.rotation.x = Math.sin(walk) * amp; limbs.armRight.rotation.x = -Math.sin(walk) * amp; limbs.legLeft.rotation.x = -Math.sin(walk) * amp; limbs.legRight.rotation.x = Math.sin(walk) * amp; }
-    rig.position.set(player.x, Math.abs(Math.sin(walk)) * 0.25 * Math.min(1, speed / 8), player.z); rig.rotation.y = player.face;
-    shadowBlob.position.x = player.x; shadowBlob.position.z = player.z;
+    if (player.y > 0 || player.vy > 0) { player.vy -= 30 * dt; player.y = Math.max(0, player.y + player.vy * dt); if (player.y === 0) player.vy = 0; }   // hop: ~1 unit high, ~0.5 s in the air
+    const air = player.y > 0;
+    rig.position.set(player.x, air ? player.y : Math.abs(Math.sin(walk)) * 0.25 * Math.min(1, speed / 8), player.z); rig.rotation.y = player.face;
+    if (air && limbs.armLeft) { limbs.armLeft.rotation.x = -2.2; limbs.armRight.rotation.x = -2.2; limbs.legLeft.rotation.x = 0.35; limbs.legRight.rotation.x = -0.25; }   // arms up while airborne
+    shadowBlob.position.x = player.x; shadowBlob.position.z = player.z; shadowBlob.scale.setScalar(1 / (1 + player.y * 0.5)); shadowBlob.material.opacity = 1 / (1 + player.y * 0.6);
 
     // fixed-angle follow camera
     look.lerp(new THREE.Vector3(player.x, 2, player.z), Math.min(1, dt * 4));
@@ -230,6 +239,9 @@ export async function createWorld(cfg) {
     spinners.forEach(o => { if (typeof o === 'function') o(t); else o.rotation.y = t * 0.8; });
     if (!near) dismissed = null; showCard(near === dismissed ? null : near);
     const fp = flyG.attributes.position; flySeed.forEach((q, i) => fp.setXYZ(i, Math.sin(q[0] + t * 0.05 * q[4]) * q[1], q[2] + Math.sin(t * q[4] + q[3]) * 0.8, Math.cos(q[0] + t * 0.05 * q[4]) * q[1])); fp.needsUpdate = true;
+    // shadows are static unless the astronaut, a bouncing building or a spinner moves
+    const springing = places.some(p => Math.abs(p.spring) > 0.001 || Math.abs(p.springV) > 0.01);
+    renderer.shadowMap.needsUpdate = frames++ < 3 || speed > 0.2 || player.y > 0 || springing || spinners.some(o => typeof o !== 'function');
     drawMap(); renderer.render(scene, camera);
   });
   return { player, places };
