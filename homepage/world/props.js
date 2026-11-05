@@ -142,37 +142,56 @@ export function eiffel(g, x, z, s = 1) {
   return { r: W0 * s * 1.05 };
 }
 
-// ================================================================ horse (shared by the Wellington statue and the Brandenburg quadriga)
-// Local frame: ground y=0, facing +x, ~2.1 long. `pre` places it. o.raise lifts the near fore-leg; o.head tilts the head up (0..1).
-function horse(B, M, pre, o = {}) {
-  const { bronze, dark } = M, raise = o.raise ?? false, hu = o.head ?? 0.5;
-  ell(B, bronze, [0.0, 1.85, 0], [1.05, 0.62, 0.52], [0, 0, 0], pre);                      // barrel
-  ell(B, bronze, [0.72, 1.95, 0], [0.55, 0.64, 0.5], [0, 0, 0.1], pre);                    // chest
-  ell(B, bronze, [-0.78, 1.95, 0], [0.62, 0.62, 0.52], [0, 0, -0.1], pre);                 // croup
-  limb(B, bronze, V(0.85, 2.05, 0), V(1.28, 2.78 + hu * 0.1, 0), 0.4, 0.28, 10, pre);       // neck, in two arched runs
-  limb(B, bronze, V(1.28, 2.78 + hu * 0.1, 0), V(1.55, 3.08 + hu * 0.18, 0), 0.28, 0.2, 10, pre);
-  const hx = 1.72, hy = 3.04 + hu * 0.18, tilt = -0.85 + hu * 0.25;
-  ell(B, bronze, [hx, hy, 0], [0.32, 0.17, 0.15], [0, 0, tilt], pre);                       // skull / jaw
-  limb(B, bronze, V(hx + 0.12, hy - 0.08, 0), V(hx + 0.38, hy - 0.4, 0), 0.14, 0.1, 8, pre);   // muzzle
-  ell(B, dark, [hx + 0.42, hy - 0.45, 0], [0.09, 0.08, 0.1], [0, 0, tilt], pre, [8, 6]);      // nose
-  for (const sg of [-1, 1]) {
-    ell(B, dark, [hx + 0.05, hy + 0.07, sg * 0.13], [0.03, 0.03, 0.03], [0, 0, 0], pre, [6, 5]);   // eyes
-    B.add(new THREE.ConeGeometry(0.05, 0.24, 6), bronze, pre.clone().multiply(new THREE.Matrix4().compose(V(hx - 0.2, hy + 0.2, sg * 0.09), rot(0, 0, 0.25), ONE)));   // ears
+// ================================================================ smooth lofted bodies (horse, rider)
+// A tube along a Catmull-Rom path with per-point elliptical radii: pts = [{ p: [x,y,z], r: radius | [ry, rz] }]. Shared vertices give smooth normals.
+const loft = (B, mat, pts, pre = I, o = {}) => {
+  const n = pts.length, rings = o.rings ?? Math.max(12, n * 5), seg = o.seg ?? 14, rr = pts.map(q => Array.isArray(q.r) ? q.r : [q.r, q.r]);
+  const curve = new THREE.CatmullRomCurve3(pts.map(q => V(...q.p)), false, 'catmullrom', 0.5);
+  const R = t => { const f = t * (n - 1), i = Math.min(n - 2, Math.floor(f)), u = f - i, w = u * u * (3 - 2 * u); return [0, 1].map(k => rr[i][k] + (rr[i + 1][k] - rr[i][k]) * w); };
+  const pos = [], uv = [], idx = [], Z = V(0, 0, 1), X = V(1, 0, 0);
+  for (let i = 0; i <= rings; i++) {
+    const t = i / rings, c = curve.getPoint(t), T = curve.getTangent(t), [ry, rz] = R(t), ref = Math.abs(T.z) > 0.9 ? X : Z;
+    const N = V().crossVectors(ref, T).normalize(), Bn = V().crossVectors(T, N).normalize();
+    for (let j = 0; j < seg; j++) { const a = j / seg * Math.PI * 2, ca = Math.cos(a) * ry, sa = Math.sin(a) * rz;
+      pos.push(c.x + ca * N.x + sa * Bn.x, c.y + ca * N.y + sa * Bn.y, c.z + ca * N.z + sa * Bn.z); uv.push(j / seg, t); }
   }
-  for (let i = 0; i < 7; i++) { const u = i / 6; ell(B, dark, [0.95 + u * 0.62, 2.35 + u * 0.78 + hu * 0.1, 0], [0.1, 0.13, 0.035], [0, 0, -0.7], pre, [8, 6]); }   // mane along the crest
-  const leg = (x, z, hind, lift) => {
-    if (!hind && lift) { limb(B, bronze, V(x, 1.5, z), V(x + 0.18, 1.1, z), 0.16, 0.1, 8, pre); limb(B, bronze, V(x + 0.18, 1.1, z), V(x - 0.15, 0.82, z), 0.085, 0.07, 8, pre); ell(B, dark, [x - 0.17, 0.74, z], [0.11, 0.08, 0.11], [0, 0, 0.5], pre, [8, 6]); return; }
-    const knee = hind ? V(x - 0.28, 0.85, z) : V(x + 0.05, 0.82, z), fet = hind ? V(x - 0.14, 0.22, z) : V(x + 0.08, 0.22, z);
-    limb(B, bronze, V(x, 1.55, z), knee, hind ? 0.19 : 0.16, 0.1, 8, pre); limb(B, bronze, knee, fet, 0.08, 0.07, 8, pre);
-    ell(B, bronze, [fet.x, fet.y, fet.z], [0.085, 0.07, 0.085], [0, 0, 0], pre, [6, 5]);
-    B.add(new THREE.CylinderGeometry(0.11, 0.13, 0.15, 8), dark, pre.clone().multiply(new THREE.Matrix4().makeTranslation(fet.x + 0.04, 0.075, fet.z)));   // hoof
+  for (let i = 0; i < rings; i++) for (let j = 0; j < seg; j++) { const a = i * seg + j, a1 = i * seg + (j + 1) % seg, b = a + seg, b1 = a1 + seg; idx.push(a, a1, b, b, a1, b1); }
+  const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); geo.setIndex(idx); geo.computeVertexNormals();
+  B.add(geo, mat, pre); return curve;
+};
+
+// ================================================================ horse (shared by the Wellington statue and the Brandenburg quadriga)
+// Local frame: ground y=0, facing +x, ~3.9 long, withers ~2.7 high. `pre` places it. o.raise lifts the near fore-leg; o.head lifts/lowers the head (0..1).
+function horse(B, M, pre, o = {}) {
+  const { bronze, dark } = M, raise = o.raise ?? false, hu = o.head ?? 0.5, dy = (hu - 0.5) * 0.5;
+  // one continuous body: rump -> croup -> barrel -> chest -> arched neck -> poll -> head -> muzzle
+  const spine = [
+    { p: [-1.3, 2.3, 0], r: [0.12, 0.1] }, { p: [-1.05, 2.32, 0], r: [0.4, 0.33] }, { p: [-0.7, 2.3, 0], r: [0.56, 0.43] }, { p: [-0.1, 2.14, 0], r: [0.63, 0.47] },
+    { p: [0.45, 2.04, 0], r: [0.64, 0.47] }, { p: [0.92, 2.16, 0], r: [0.58, 0.43] }, { p: [1.17, 2.52, 0], r: [0.43, 0.32] }, { p: [1.4, 2.92, 0], r: [0.33, 0.25] },
+    { p: [1.62, 3.2 + dy * 0.5, 0], r: [0.26, 0.2] }, { p: [1.84, 3.32 + dy, 0], r: [0.21, 0.17] }, { p: [2.1, 3.17 + dy, 0], r: [0.17, 0.14] },
+    { p: [2.38, 2.94 + dy, 0], r: [0.12, 0.105] }, { p: [2.5, 2.83 + dy, 0], r: [0.07, 0.07] }];
+  const curve = loft(B, bronze, spine, pre, { rings: 70, seg: 18 });
+  // crest mane: a flattened ribbon riding the neck's upper-back edge
+  const mane = []; for (let i = 0; i <= 8; i++) { const t = 0.5 + i * 0.055, c = curve.getPoint(t), T = curve.getTangent(t), f = t * (spine.length - 1), k = Math.min(spine.length - 2, Math.floor(f)), ry = spine[k].r[0];
+    mane.push({ p: [c.x - T.y * ry * 0.95, c.y + T.x * ry * 0.95, 0], r: [0.07 - i * 0.004, 0.035] }); }
+  loft(B, dark, mane, pre, { rings: 20, seg: 8 });
+  const head = spine[9].p, ex = spine[10].p;
+  for (const sg of [-1, 1]) {
+    B.add(new THREE.ConeGeometry(0.05, 0.26, 6), bronze, pre.clone().multiply(new THREE.Matrix4().compose(V(head[0] - 0.05, head[1] + 0.22, sg * 0.09), rot(0, 0, -0.1), ONE)));   // ears
+    ell(B, dark, [ex[0] - 0.12, ex[1] + 0.07, sg * 0.125], [0.03, 0.03, 0.025], [0, 0, 0], pre, [6, 5]);                                                                      // eyes
+    ell(B, dark, [spine[12].p[0] - 0.02, spine[12].p[1] + 0.03, sg * 0.04], [0.035, 0.03, 0.03], [0, 0, 0], pre, [6, 5]);                                                     // nostrils
+  }
+  // legs: thick muscle at the top, slim cannon, fetlock, pastern and a flared hoof
+  const leg = (pts, z) => {
+    loft(B, bronze, pts.map(([x, y, r]) => ({ p: [x, y, z], r })), pre, { rings: 28, seg: 10 });
+    const h = pts[pts.length - 1]; B.add(new THREE.CylinderGeometry(0.115, 0.14, 0.14, 10), dark, pre.clone().multiply(new THREE.Matrix4().makeTranslation(h[0], h[1] + 0.05, z)));
   };
-  leg(0.85, 0.3, false, false); leg(0.85, -0.3, false, raise); leg(-0.88, 0.34, true); leg(-0.88, -0.34, true);
-  ell(B, bronze, [0.85, 1.7, 0.3], [0.25, 0.3, 0.14], [0, 0, 0], pre, [8, 6]); ell(B, bronze, [0.85, 1.7, -0.3], [0.25, 0.3, 0.14], [0, 0, 0], pre, [8, 6]);   // shoulders
-  ell(B, bronze, [-0.9, 1.75, 0.34], [0.36, 0.46, 0.2], [0, 0, 0], pre, [8, 6]); ell(B, bronze, [-0.9, 1.75, -0.34], [0.36, 0.46, 0.2], [0, 0, 0], pre, [8, 6]);  // haunches
-  const tail = [[-1.35, 2.35], [-1.65, 2.15], [-1.85, 1.65], [-1.9, 1.05], [-1.85, 0.5]];                   // tail, a drooping chain
-  for (let i = 0; i < tail.length - 1; i++) limb(B, dark, V(tail[i][0], tail[i][1], 0), V(tail[i + 1][0], tail[i + 1][1], 0), 0.1 - i * 0.012, 0.09 - i * 0.014, 7, pre);
-  ell(B, dark, [-1.85, 0.4, 0], [0.09, 0.2, 0.08], [0, 0, 0], pre, [8, 6]);
+  const fore = [[0.82, 2.05, 0.26], [0.85, 1.55, 0.17], [0.87, 1.05, 0.115], [0.87, 0.6, 0.078], [0.88, 0.24, 0.09], [0.92, 0.12, 0.085], [0.95, 0.04, 0.105]];
+  const lifted = [[0.82, 2.05, 0.26], [0.96, 1.62, 0.17], [1.22, 1.35, 0.115], [1.2, 0.98, 0.078], [1.1, 0.72, 0.09], [1.16, 0.62, 0.085], [1.24, 0.56, 0.105]];
+  const hind = [[-0.9, 2.12, 0.32], [-0.7, 1.6, 0.21], [-0.9, 1.15, 0.14], [-1.02, 0.82, 0.105], [-0.98, 0.46, 0.075], [-0.94, 0.2, 0.09], [-0.92, 0.05, 0.105]];
+  leg(fore, 0.27); leg(raise ? lifted : fore, -0.27); leg(hind, 0.3); leg(hind, -0.3);
+  // tail: a heavy flowing sweep, flattened sideways
+  loft(B, dark, [{ p: [-1.25, 2.3, 0], r: [0.07, 0.07] }, { p: [-1.52, 2.2, 0], r: [0.12, 0.08] }, { p: [-1.72, 1.78, 0], r: [0.16, 0.09] }, { p: [-1.78, 1.2, 0], r: [0.14, 0.07] }, { p: [-1.72, 0.65, 0], r: [0.08, 0.04] }], pre, { rings: 24, seg: 10 });
 }
 
 // ================================================================ Duke of Wellington (Glasgow), with the traditional traffic cone
@@ -199,29 +218,28 @@ export function wellington(g, x, z, s = 1.3) {
   const back = put(t, new THREE.Mesh(new THREE.PlaneGeometry(1.3, 0.65), new THREE.MeshStandardMaterial({ map: ptex, roughness: 0.5, metalness: 0.3 })), 0, 1.45, -0.88); back.rotation.y = Math.PI; back.castShadow = false;
   horse(B, M, S, { raise: true, head: 0.55 });
   // saddle, cloth and stirrups
-  ell(B, dark, [0.05, 2.55, 0], [0.5, 0.1, 0.42], [0, 0, 0], S); ell(B, std(0x3d5a4a), [0.05, 2.45, 0], [0.56, 0.14, 0.5], [0, 0, 0], S);
+  ell(B, dark, [0.05, 2.66, 0], [0.5, 0.1, 0.42], [0, 0, 0], S); ell(B, std(0x3d5a4a), [0.05, 2.58, 0], [0.56, 0.12, 0.5], [0, 0, 0], S);
   for (const sg of [-1, 1]) { limb(B, dark, V(0.25, 2.45, sg * 0.45), V(0.3, 1.85, sg * 0.52), 0.02, 0.02, 5, S); B.add(new THREE.TorusGeometry(0.1, 0.025, 5, 12), dark, S.clone().multiply(new THREE.Matrix4().compose(V(0.3, 1.75, sg * 0.52), rot(0, Math.PI / 2, 0), ONE))); }
-  // rider: boots, legs, coat, epaulettes, head, bicorne, arms with reins and baton
+  // rider: boots, thighs, a smooth tailcoat torso, shoulders, head, bicorne, arms with reins and baton
   for (const sg of [-1, 1]) {
-    limb(B, verd, V(-0.05, 2.72, sg * 0.17), V(0.42, 2.35, sg * 0.42), 0.17, 0.12, 8, S);
-    limb(B, verd, V(0.42, 2.35, sg * 0.42), V(0.32, 1.78, sg * 0.5), 0.12, 0.09, 8, S);
-    limb(B, dark, V(0.32, 1.78, sg * 0.5), V(0.46, 1.64, sg * 0.5), 0.1, 0.11, 8, S);
+    loft(B, verd, [{ p: [-0.05, 2.78, sg * 0.2], r: 0.2 }, { p: [0.4, 2.45, sg * 0.43], r: 0.15 }, { p: [0.34, 1.95, sg * 0.5], r: 0.115 }, { p: [0.36, 1.74, sg * 0.5], r: 0.1 }], S, { rings: 22, seg: 10 });
+    B.add(new THREE.CylinderGeometry(0.105, 0.125, 0.24, 10), dark, S.clone().multiply(new THREE.Matrix4().makeTranslation(0.4, 1.66, sg * 0.5)));       // boot
+    B.add(sbox(0.3, 0.07, 0.17), dark, S.clone().multiply(new THREE.Matrix4().makeTranslation(0.5, 1.54, sg * 0.5)));                                  // boot sole / toe
   }
-  limb(B, verd, V(-0.12, 2.75, 0), V(-0.05, 3.5, 0), 0.31, 0.3, 12, S);
-  limb(B, verd, V(-0.18, 2.5, 0), V(-0.08, 3.0, 0), 0.4, 0.3, 12, S);   // coat skirt over the saddle
-  ell(B, verd, [-0.05, 3.5, 0], [0.2, 0.12, 0.42], [0, 0, 0], S);
-  ell(B, verd, [0.0, 3.8, 0], [0.2, 0.23, 0.19], [0, 0, 0], S); ell(B, dark, [0.14, 3.76, 0], [0.05, 0.05, 0.05], [0, 0, 0], S, [6, 5]);
-  ell(B, dark, [0.0, 4.02, 0], [0.18, 0.1, 0.45], [0, 0, 0.15], S);                                   // bicorne
-  limb(B, verd, V(-0.05, 3.45, 0.4), V(0.12, 3.1, 0.5), 0.1, 0.09, 7, S); limb(B, verd, V(0.12, 3.1, 0.5), V(0.4, 2.95, 0.3), 0.09, 0.075, 7, S);
-  limb(B, verd, V(-0.05, 3.45, -0.4), V(0.1, 3.15, -0.5), 0.1, 0.09, 7, S); limb(B, verd, V(0.1, 3.15, -0.5), V(0.45, 3.45, -0.38), 0.09, 0.075, 7, S);
-  limb(B, dark, V(0.45, 3.45, -0.38), V(0.95, 3.78, -0.38), 0.035, 0.03, 6, S);                        // baton
-  for (const sg of [-1, 1]) limb(B, dark, V(0.4, 2.95, 0.3), V(1.98, 2.62, sg * 0.1), 0.012, 0.012, 4, S);   // reins
+  loft(B, verd, [{ p: [-0.22, 2.7, 0], r: [0.3, 0.34] }, { p: [-0.1, 3.05, 0], r: [0.26, 0.35] }, { p: [-0.04, 3.4, 0], r: [0.25, 0.4] }, { p: [-0.02, 3.62, 0], r: [0.2, 0.33] }, { p: [0.0, 3.76, 0], r: [0.1, 0.1] }], S, { rings: 26, seg: 14 });   // coat and torso
+  loft(B, verd, [{ p: [-0.3, 2.62, 0], r: [0.12, 0.3] }, { p: [-0.6, 2.28, 0], r: [0.1, 0.34] }, { p: [-0.72, 1.98, 0], r: [0.05, 0.2] }], S, { rings: 14, seg: 12 });   // coat tails hanging behind the saddle
+  ell(B, verd, [-0.02, 3.55, 0.4], [0.16, 0.14, 0.15], [0, 0, 0], S, [8, 6]); ell(B, verd, [-0.02, 3.55, -0.4], [0.16, 0.14, 0.15], [0, 0, 0], S, [8, 6]);    // epaulettes
+  ell(B, verd, [0.03, 3.98, 0], [0.19, 0.23, 0.18], [0, 0, 0], S); ell(B, verd, [0.2, 3.92, 0], [0.07, 0.07, 0.07], [0, 0, 0], S, [8, 6]);                       // head, nose
+  ell(B, dark, [0.0, 4.2, 0], [0.2, 0.09, 0.46], [0, 0, 0.12], S);                                                                                           // bicorne
+  for (const sg of [-1, 1]) loft(B, verd, [{ p: [-0.02, 3.52, sg * 0.42], r: 0.12 }, { p: [0.14, 3.2, sg * 0.52], r: 0.1 }, { p: [sg > 0 ? 0.42 : 0.5, sg > 0 ? 3.0 : 3.42, sg * 0.34], r: 0.08 }], S, { rings: 16, seg: 10 });
+  limb(B, dark, V(0.5, 3.42, -0.34), V(1.0, 3.8, -0.34), 0.035, 0.03, 6, S);                                // baton
+  for (const sg of [-1, 1]) limb(B, dark, V(0.42, 3.0, 0.34), V(1.95, 2.7 + 0.0, sg * 0.12), 0.012, 0.012, 4, S);   // reins
   // the cone: orange with two white bands and a square base, as worn by the real statue
-  const cb = 4.1;
-  B.add(sbox(0.95, 0.05, 0.95), orange, S.clone().multiply(new THREE.Matrix4().makeTranslation(0.0, cb, 0)));
-  B.add(new THREE.ConeGeometry(0.42, 1.1, 18), orange, S.clone().multiply(new THREE.Matrix4().makeTranslation(0.0, cb + 0.6, 0)));
-  B.add(new THREE.CylinderGeometry(0.29, 0.34, 0.16, 18), white, S.clone().multiply(new THREE.Matrix4().makeTranslation(0.0, cb + 0.4, 0)));
-  B.add(new THREE.CylinderGeometry(0.17, 0.21, 0.12, 18), white, S.clone().multiply(new THREE.Matrix4().makeTranslation(0.0, cb + 0.78, 0)));
+  const cb = 4.26;
+  B.add(sbox(0.62, 0.05, 0.62), orange, S.clone().multiply(new THREE.Matrix4().makeTranslation(0.0, cb, 0)));
+  B.add(new THREE.ConeGeometry(0.27, 0.78, 18), orange, S.clone().multiply(new THREE.Matrix4().makeTranslation(0.0, cb + 0.42, 0)));
+  B.add(new THREE.CylinderGeometry(0.19, 0.22, 0.1, 18), white, S.clone().multiply(new THREE.Matrix4().makeTranslation(0.0, cb + 0.27, 0)));
+  B.add(new THREE.CylinderGeometry(0.11, 0.14, 0.08, 18), white, S.clone().multiply(new THREE.Matrix4().makeTranslation(0.0, cb + 0.55, 0)));
   B.flush(t);
   return { r: 2.4 * s };
 }
