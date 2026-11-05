@@ -96,6 +96,15 @@ export function arch(w, h, oy = 0, hole = false) {
   p.bezierCurveTo(w * 0.1, top - w * 0.12, w / 2, sp + w * 0.45, w / 2, sp);
   p.lineTo(w / 2, oy); p.closePath(); return p;
 }
+// round (semicircular) arch outline, base at oy
+export function rarch(w, h, oy = 0, hole = false) {
+  const p = hole ? new THREE.Path() : new THREE.Shape(), r = w / 2, sp = oy + h - r;
+  p.moveTo(-r, oy); p.lineTo(-r, sp); p.absarc(0, sp, r, Math.PI, 0, true); p.lineTo(r, oy); p.closePath(); return p;
+}
+// rectangle outline
+export function rect(w, h, oy = 0, hole = false) {
+  const p = hole ? new THREE.Path() : new THREE.Shape(); p.moveTo(-w / 2, oy); p.lineTo(w / 2, oy); p.lineTo(w / 2, oy + h); p.lineTo(-w / 2, oy + h); p.closePath(); return p;
+}
 export const extrude = (shape, depth) => worldUV(new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false, curveSegments: 8 }));
 
 // collects geometry per material, then merges into one mesh each (hundreds of parts, a handful of draw calls)
@@ -157,5 +166,57 @@ export function parts(B, M) {
     s.closePath();
     return extrude(s, depth).translate(0, 0, z - depth / 2);
   };
-  return { bx, col, cone, lancet, bay, balcony, merlons, roof, crowStep };
+
+  // ---- classical parts
+  // rectangular window: surround, recessed glass, glazing bars, sill, optional triangular pediment
+  const swin = (base, x, y, w, h, o = {}) => {
+    const f = 0.13, outer = rect(w + 2 * f, h + f * 1.4, 0); outer.holes.push(rect(w, h, f * 0.5, true));
+    B.add(extrude(outer, 0.17), o.surround ?? trim, base.clone().multiply(mat4(x, y, 0)));
+    B.add(extrude(rect(w, h, f * 0.5), 0.02), glass, base.clone().multiply(mat4(x, y, 0.01)));
+    bx(bar, 0.035, h, 0.05, x, y + f * 0.5, 0.03, base); bx(bar, w, 0.03, 0.05, x, y + h * 0.62, 0.03, base);
+    bx(trim, w + 0.4, 0.09, 0.3, x, y - 0.07, 0.15, base);
+    if (o.pedi) { const s = new THREE.Shape(); s.moveTo(-(w + 0.5) / 2, 0); s.lineTo((w + 0.5) / 2, 0); s.lineTo(0, 0.32); s.closePath();
+      B.add(extrude(s, 0.18), trim, base.clone().multiply(mat4(x, y + h + f * 1.4, 0))); }
+  };
+  // round-arched window with a moulded ring and keystone
+  const rwin = (base, x, y, w, h, o = {}) => {
+    const f = o.f ?? 0.14, outer = rarch(w + 2 * f, h + f * 1.2, 0); outer.holes.push(rarch(w, h, f * 0.5, true));
+    B.add(extrude(outer, 0.17), trim, base.clone().multiply(mat4(x, y, 0)));
+    B.add(extrude(rarch(w, h, f * 0.5), 0.02), o.mat ?? glass, base.clone().multiply(mat4(x, y, 0.01)));
+    if (o.bars !== false) { bx(bar, 0.035, h * 0.8, 0.05, x, y + f * 0.5, 0.03, base); bx(bar, w, 0.03, 0.05, x, y + h * 0.55, 0.03, base); }
+    bx(trim, f * 1.5, f * 1.4, 0.24, x, y + h + f * 0.2, 0.05, base);                    // keystone
+  };
+  // niche: dark round-headed recess; with an optional statue
+  const niche = (base, x, y, w, h, statueOn = true) => {
+    const o = rarch(w + 0.2, h + 0.1); o.holes.push(rarch(w, h, 0.05, true));
+    B.add(extrude(o, 0.1), trim, base.clone().multiply(mat4(x, y, 0)));
+    B.add(extrude(rarch(w, h, 0.05), 0.02), M.recess ?? bar, base.clone().multiply(mat4(x, y, 0.005)));
+    if (statueOn) statue(base, x, y + 0.1, 0.1, h * 0.55);
+  };
+  const statue = (base, x, y, z, h = 1) => {
+    const m = base.clone().multiply(mat4(x, y, z));
+    B.add(sbox(h * 0.4, h * 0.12, h * 0.3), trim, m.clone().multiply(mat4(0, h * 0.06, 0)));
+    B.add(new THREE.CapsuleGeometry(h * 0.1, h * 0.4, 3, 8), trim, m.clone().multiply(mat4(0, h * 0.12 + h * 0.3, 0)));
+    B.add(new THREE.SphereGeometry(h * 0.085, 8, 6), trim, m.clone().multiply(mat4(0, h * 0.12 + h * 0.62, 0)));
+  };
+  // row of dentil blocks under a cornice, along x
+  const dentils = (w, x, y, z, base = I, step = 0.26) => { for (let t = 0; t <= w - 0.1; t += step) bx(trim, 0.13, 0.15, 0.13, x - w / 2 + 0.1 + t, y, z, base); };
+  // balustrade along x
+  const balustrade = (w, x, y, z, base = I, h = 0.5) => {
+    bx(trim, w, 0.1, 0.22, x, y, z, base); bx(trim, w, 0.09, 0.2, x, y + h - 0.09, z, base);
+    for (let t = 0; t <= w - 0.1; t += 0.28) B.add(scol(0.045, 0.07, h - 0.19, 6), trim, base.clone().multiply(mat4(x - w / 2 + 0.1 + t, y + 0.1 + (h - 0.19) / 2, z)));
+  };
+  // fluted Corinthian column (base, 16-flute shaft, bell capital with abacus and volutes)
+  const corinthian = (x, y, z, r, h, base = I) => {
+    const m = base.clone().multiply(mat4(x, y, z)), N = 16, s = new THREE.Shape();
+    for (let i = 0; i <= 96; i++) { const a = i / 96 * Math.PI * 2, rr = r * (1 - 0.06 * Math.pow(0.5 - 0.5 * Math.cos(N * a), 1.5)); i ? s.lineTo(Math.cos(a) * rr, Math.sin(a) * rr) : s.moveTo(Math.cos(a) * rr, Math.sin(a) * rr); }
+    B.add(worldUV(new THREE.ExtrudeGeometry(s, { depth: h, bevelEnabled: false, curveSegments: 1 }).rotateX(-Math.PI / 2)), trim, m.clone().multiply(mat4(0, 0.16, 0)));
+    B.add(sbox(r * 2.9, 0.08, r * 2.9), trim, m.clone().multiply(mat4(0, 0.04, 0)));
+    B.add(new THREE.TorusGeometry(r * 1.05, r * 0.2, 6, 14).rotateX(Math.PI / 2), trim, m.clone().multiply(mat4(0, 0.14, 0)));
+    const cap = new THREE.LatheGeometry([[r * 0.92, 0], [r * 1.0, 0.1], [r * 1.25, 0.28], [r * 1.5, 0.46], [r * 1.55, 0.5]].map(p => new THREE.Vector2(p[0], p[1])), 14);
+    B.add(cap, trim, m.clone().multiply(mat4(0, 0.16 + h, 0)));
+    B.add(sbox(r * 3.3, 0.1, r * 3.3), trim, m.clone().multiply(mat4(0, 0.16 + h + 0.5, 0)));
+    for (const [cx, cz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) B.add(new THREE.SphereGeometry(r * 0.2, 6, 5), trim, m.clone().multiply(mat4(cx * r * 1.35, 0.16 + h + 0.42, cz * r * 1.35)));
+  };
+  return { bx, col, cone, lancet, bay, balcony, merlons, roof, crowStep, swin, rwin, niche, statue, dentils, balustrade, corinthian };
 }

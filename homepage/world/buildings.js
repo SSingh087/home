@@ -79,24 +79,8 @@ export function svnit(g, sp, o = {}) {
   return { r: 9, front: 9.8, h: 11, cols: [...P, { x: 0, z: 0, r: 7.5 }, { x: -6.2, z: -5.5, r: 3.8 }, { x: 6.3, z: -1.2, r: 2.6 }, { x: -3.6, z: 6.6, r: 0.9 }, { x: 3.6, z: 6.6, r: 0.9 }] };
 }
 
-// ---------------------------------------------------------------- Sorbonne chapel
-export function sorbonne(g, sp, o = {}) {
-  const stone = (cols, rows, rx = 3, ry = 1) => wall({ base: '#e9d7b0', line: 'rgba(120,95,50,.14)', win: '#3d4756', frame: '#f6ead0', cols, rows, arch: true, tall: true }, rx, ry);
-  rbox(g, 16, 5.5, 5.5, 0, 0, -0.5, stone(5, 2, 3, 1), 0.3);
-  rbox(g, 6.2, 7.4, 3.2, 0, 0, 3.6, stone(2, 2, 1, 1), 0.3);
-  prism(g, 7, 1.9, 3.6, 0, 7.4, 3.6, M(0xefe0bd));
-  [-2.4, -0.8, 0.8, 2.4].forEach(x => cyl(g, 0.4, 0.4, 6, x, 0, 5.6, M(0xf6ead0), 14));
-  rbox(g, 7, 0.7, 1.4, 0, 6, 5.6, M(0xf6ead0), 0.15);
-  cyl(g, 3.4, 3.6, 3, 0, 5.5, -0.5, M(0xefe0bd));
-  dome(g, 3.5, 0, 8.5, -0.5, M(SLATE, { roughness: 0.6 }));
-  ribs(g, 3.52, 8, 0, 8.5, -0.5, M(0x98a4b1, { roughness: 0.5 }));
-  cyl(g, 0.9, 1.1, 1.6, 0, 12, -0.5, M(0x3d4450), 12);
-  dome(g, 0.9, 0, 13.6, -0.5, M(0x3d4450));
-  const green = M(0x5f9c86); rbox(g, 0.18, 1.8, 0.18, 0, 14.5, -0.5, green, 0.05); rbox(g, 0.9, 0.18, 0.18, 0, 15.5, -0.5, green, 0.05);
-  const clock = clockFace(); clock.scale.setScalar(0.7); clock.position.set(0, 5.2, 5.25); g.add(clock);
-  const P = []; if (o.props !== false) { flagpole(g, 'france', 8.5, 6.5, sp, 6); P.push({ x: 8.5, z: 6.5, r: 0.5, prop: true }); }
-  return { r: 9.5, front: 9.2, h: 18, cols: [...P, { x: 0, z: -0.5, r: 8 }, { x: 0, z: 4, r: 3.4 }] };
-}
+// Sorbonne chapel lives in sorbonne.js (detailed masonry build)
+export { sorbonne } from './sorbonne.js';
 
 // ---------------------------------------------------------------- Observatoire de Paris
 export function observatoire(g, sp, o = {}) {
