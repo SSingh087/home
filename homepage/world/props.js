@@ -64,81 +64,43 @@ export function flagpole(g, kind, x, z, animators, h = 7) {
   animators.push(t => { const p = geo.attributes.position; for (let i = 0; i < p.count; i++) { const bx = baseP[i * 3] + 1.6; p.setZ(i, Math.sin(bx * 1.6 - t * 4) * 0.22 * (bx / 3.2)); } p.needsUpdate = true; });
 }
 
-// ================================================================ Eiffel Tower
-const rivetTex = () => {
-  const c = document.createElement('canvas'); c.width = c.height = 64; const k = c.getContext('2d'); k.fillStyle = '#7c7c7c'; k.fillRect(0, 0, 64, 64);
-  const r = rng(17); for (let i = 0; i < 160; i++) { k.fillStyle = r() < 0.5 ? '#3a3a3a' : '#c8c8c8'; k.fillRect(r() * 64, r() * 64, 2, 2); }
-  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t;
-};
-
-// Four lattice legs on the real exponential taper, open arches with lattice ribs, X-braced faces with finer sub-bracing low down,
-// three platforms with railings, an upper cabin, a lattice spire and antenna. All ironwork merges into a single mesh.
+// ================================================================ Eiffel Tower (the original lighter-weight model, kept on purpose)
+const _cyl = (g, rt, rb, h, x, y, z, m, seg = 12) => put(g, new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), m), x, y + h / 2, z);
+const _box = (g, w, h, d, x, y, z, m) => put(g, new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m), x, y + h / 2, z);
+// Eiffel Tower: four legs on the real exponential-taper profile, arches, X-bracing, three platforms and a spire
 export function eiffel(g, x, z, s = 1) {
-  const iron = new THREE.MeshStandardMaterial({ color: 0xffffff, vertexColors: true, roughness: 0.62, metalness: 0.2, emissive: 0x2a1a0c, emissiveIntensity: 0.35, bumpMap: rivetTex(), bumpScale: 0.8 });
-  const deckMat = std(0xb8a07f, { roughness: 0.6 });
-  const B = new Batch(), D = new Batch(), rnd = rng(3), brown = new THREE.Color(0x7e6048);
+  const iron = std(0x8a6c52, { roughness: 0.5, metalness: 0.15, emissive: 0x2a1a0c, emissiveIntensity: 0.4 }), light = std(0xb89a78, { roughness: 0.5 });
   const t = new THREE.Group(); t.position.set(x, 0, z); t.scale.setScalar(s); g.add(t);
-  const H = 19, W0 = 4.2, w = f => W0 * (0.93 * Math.exp(-4.3 * f) + 0.07);
-  const beam = (a, b, r) => {
-    const { len, m } = along(a, b), geo = new THREE.BoxGeometry(2 * r, len, 2 * r), uv = geo.attributes.uv;
-    for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * 0.3, uv.getY(i) * len / 1.2);
-    B.add(tint(geo, brown.clone().multiplyScalar(0.82 + rnd() * 0.3)), iron, m);
+  const H = 19, W0 = 4.2, w = f => W0 * (0.93 * Math.exp(-4.3 * f) + 0.07); // half-width at height fraction f
+  const strut = (a, b, r, m = iron, shadow = false) => {
+    const d = b.clone().sub(a), len = d.length(), c = new THREE.Mesh(new THREE.CylinderGeometry(r, r, len, 6), m);
+    c.position.copy(a).addScaledVector(d, 0.5); c.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); c.castShadow = shadow; t.add(c); return c;
   };
-  const FT = 0.215, N = 22, FP = [0.27, 0.56, 0.8];
-  const P = (a, f, ax, sg) => ax === 0 ? V(a * w(f), f * H, sg * w(f)) : V(sg * w(f), f * H, a * w(f));   // point on a lattice face
-  // legs: four thin members per corner, tied by square rungs
-  for (const a of [-1, 1]) for (const b of [-1, 1]) {
-    const sub = [[-1, -1], [1, -1], [-1, 1], [1, 1]];
-    const at = (i, f) => { const o = 0.5 * (1 - f) + 0.08, [ox, oz] = sub[i]; return V(a * w(f) + ox * o, f * H, b * w(f) + oz * o); };
-    for (let i = 0; i < N; i++) {
-      const f0 = i / N, f1 = (i + 1) / N, r = 0.075 * (1 - f0) + 0.035;
-      for (let k = 0; k < 4; k++) beam(at(k, f0), at(k, f1), r);
-      if (i % 2 === 0) for (const [p, q] of [[0, 1], [1, 3], [3, 2], [2, 0], [0, 3]]) beam(at(p, f0), at(q, f0), 0.035);
-      for (const [p, q] of [[0, 1], [2, 3], [0, 2], [1, 3]]) { beam(at(p, f0), at(q, f1), 0.03); beam(at(q, f0), at(p, f1), 0.03); }   // X bracing inside the leg
+  const P = (a, f, b) => new THREE.Vector3(a * w(f), f * H, b * w(f));
+  const N = 14;
+  for (const a of [-1, 1]) for (const b of [-1, 1]) for (let i = 0; i < N; i++) { // the four curved legs / shaft corners
+    const f0 = i / N, f1 = (i + 1) / N; strut(P(a, f0, b), P(a, f1, b), 0.34 * (1 - f0 * 0.65) + 0.1, iron, true);
+  }
+  for (let i = 0; i < N - 1; i += 2) { // X-bracing on all four faces
+    const f0 = i / N, f1 = (i + 2) / N;
+    for (const [ax, az] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const pa = (a, f) => ax ? new THREE.Vector3(ax * w(f), f * H, a * w(f)) : new THREE.Vector3(a * w(f), f * H, az * w(f));
+      strut(pa(-1, f0), pa(1, f1), 0.09); strut(pa(1, f0), pa(-1, f1), 0.09); strut(pa(-1, f1), pa(1, f1), 0.1);
     }
   }
-  // faces above the arches: horizontal girders, X bracing, and a mid post with finer X's on the lower tiers
-  for (let ax = 0; ax < 2; ax++) for (const sg of [-1, 1]) for (let i = Math.ceil(FT * N); i < N; i++) {
-    const f0 = i / N, f1 = (i + 1) / N, low = f0 < 0.56;
-    beam(P(-1, f0, ax, sg), P(1, f0, ax, sg), 0.07);
-    beam(P(-1, f0, ax, sg), P(1, f1, ax, sg), 0.05); beam(P(1, f0, ax, sg), P(-1, f1, ax, sg), 0.05);
-    if (low) {
-      beam(P(0, f0, ax, sg), P(0, f1, ax, sg), 0.045);
-      beam(P(-1, f0, ax, sg), P(0, f1, ax, sg), 0.035); beam(P(0, f0, ax, sg), P(-1, f1, ax, sg), 0.035);
-      beam(P(1, f0, ax, sg), P(0, f1, ax, sg), 0.035); beam(P(0, f0, ax, sg), P(1, f1, ax, sg), 0.035);
-    }
+  // the big arches between the legs
+  for (const [ry, off] of [[0, 1], [Math.PI / 2, 1], [0, -1], [Math.PI / 2, -1]]) {
+    const r = w(0.04) * 0.82, arch = new THREE.Mesh(new THREE.TorusGeometry(r, 0.26, 6, 22, Math.PI), iron);
+    arch.rotation.y = ry; arch.position.set(ry ? off * w(0.045) : 0, 0.05, ry ? 0 : off * w(0.045)); arch.castShadow = true; t.add(arch);
   }
-  // the four great arches: an outer and an inner rib following the leaning face, joined by spokes
-  for (let ax = 0; ax < 2; ax++) for (const sg of [-1, 1]) {
-    const K = 28, ft2 = FT - 0.05;
-    for (let k = 0; k < K; k++) {
-      const p0 = Math.PI * k / K, p1 = Math.PI * (k + 1) / K;
-      beam(P(Math.cos(p0), FT * Math.sin(p0), ax, sg), P(Math.cos(p1), FT * Math.sin(p1), ax, sg), 0.15);
-      beam(P(Math.cos(p0), ft2 * Math.sin(p0), ax, sg), P(Math.cos(p1), ft2 * Math.sin(p1), ax, sg), 0.09);
-      if (k % 2 === 1) beam(P(Math.cos(p0), ft2 * Math.sin(p0), ax, sg), P(Math.cos(p0), FT * Math.sin(p0), ax, sg), 0.05);
-    }
-  }
-  // platforms: deck, girder skirt, balustrade
-  FP.forEach((f, n) => {
-    const half = w(f) + [0.75, 0.6, 0.5][n], y = f * H, th = [0.34, 0.3, 0.26][n];
-    D.add(new THREE.BoxGeometry(half * 2, th, half * 2), deckMat, new THREE.Matrix4().makeTranslation(0, y, 0));
-    for (const sg of [-1, 1]) {
-      beam(V(-half, y - th * 0.7, sg * half), V(half, y - th * 0.7, sg * half), 0.1); beam(V(sg * half, y - th * 0.7, -half), V(sg * half, y - th * 0.7, half), 0.1);
-      beam(V(-half, y + 0.55, sg * half), V(half, y + 0.55, sg * half), 0.035); beam(V(sg * half, y + 0.55, -half), V(sg * half, y + 0.55, half), 0.035);
-    }
-    const post = (px, pz) => beam(V(px, y + th / 2, pz), V(px, y + 0.55, pz), 0.03), cnt = Math.ceil(half * 2 / 0.42);
-    for (let i = 0; i <= cnt; i++) { const q = -half + i * half * 2 / cnt; post(q, half); post(q, -half); post(half, q); post(-half, q); }
-    if (n === 0) for (const sg of [-1, 1]) { beam(V(-half, y - th * 0.7 - 0.5, sg * half), V(half, y - th * 0.7 - 0.5, sg * half), 0.07); beam(V(sg * half, y - th * 0.7 - 0.5, -half), V(sg * half, y - th * 0.7 - 0.5, half), 0.07); }
+  // platforms with a thin railing
+  [[0.27, 1.0], [0.56, 1.0], [0.8, 1.0]].forEach(([f]) => {
+    const half = w(f) + 0.55; _box(t, half * 2, 0.4, half * 2, 0, f * H, 0, light);
+    _box(t, half * 2 + 0.2, 0.12, half * 2 + 0.2, 0, f * H + 0.4, 0, iron);
   });
-  // upper cabin and lattice spire
-  { const y0 = 0.86 * H, c = 0.55; D.add(new THREE.BoxGeometry(c * 2, 1.1, c * 2), deckMat, new THREE.Matrix4().makeTranslation(0, y0 + 0.55, 0));
-    for (let i = 0; i < 4; i++) beam(V(i % 2 ? c : -c, y0, i < 2 ? c : -c), V(i % 2 ? c * 0.55 : -c * 0.55, y0 + 1.7, i < 2 ? c * 0.55 : -c * 0.55), 0.05); }
-  const sw = 0.3, sy = H;
-  for (const [a, b] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) beam(V(a * sw, sy, b * sw), V(a * 0.04, sy + 3.5, b * 0.04), 0.05);
-  for (const f of [0.25, 0.55, 0.8]) { const r = sw * (1 - f); for (const sgn of [-1, 1]) { beam(V(-r, sy + f * 3.5, sgn * r), V(r, sy + f * 3.5, sgn * r), 0.035); beam(V(sgn * r, sy + f * 3.5, -r), V(sgn * r, sy + f * 3.5, r), 0.035); } }
-  beam(V(0, sy + 3.4, 0), V(0, sy + 5.7, 0), 0.04);
-  B.flush(t); D.flush(t);
-  put(t, new THREE.Mesh(new THREE.SphereGeometry(0.13, 8, 6), std(0xff4a4a, { emissive: 0xff2a2a, emissiveIntensity: 1 })), 0, H + 5.8, 0).castShadow = false;
+  const top = new THREE.Mesh(new THREE.ConeGeometry(0.42, 4.2, 4), iron); top.position.y = H + 1.8; top.rotation.y = Math.PI / 4; top.castShadow = true; t.add(top);
+  strut(new THREE.Vector3(0, H + 3.6, 0), new THREE.Vector3(0, H + 5.6, 0), 0.05, light);
+  put(t, new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 6), std(0xff4a4a, { emissive: 0xff2a2a, emissiveIntensity: 1 })), 0, H + 5.7, 0);
   return { r: W0 * s * 1.05 };
 }
 
@@ -167,9 +129,9 @@ function horse(B, M, pre, o = {}) {
   // one continuous body: rump -> croup -> barrel -> chest -> arched neck -> poll -> head -> muzzle
   const spine = [
     { p: [-1.3, 2.3, 0], r: [0.12, 0.1] }, { p: [-1.05, 2.32, 0], r: [0.4, 0.33] }, { p: [-0.7, 2.3, 0], r: [0.56, 0.43] }, { p: [-0.1, 2.14, 0], r: [0.63, 0.47] },
-    { p: [0.45, 2.04, 0], r: [0.64, 0.47] }, { p: [0.92, 2.16, 0], r: [0.58, 0.43] }, { p: [1.17, 2.52, 0], r: [0.43, 0.32] }, { p: [1.4, 2.92, 0], r: [0.33, 0.25] },
-    { p: [1.62, 3.2 + dy * 0.5, 0], r: [0.26, 0.2] }, { p: [1.84, 3.32 + dy, 0], r: [0.21, 0.17] }, { p: [2.1, 3.17 + dy, 0], r: [0.17, 0.14] },
-    { p: [2.38, 2.94 + dy, 0], r: [0.12, 0.105] }, { p: [2.5, 2.83 + dy, 0], r: [0.07, 0.07] }];
+    { p: [0.45, 2.04, 0], r: [0.64, 0.47] }, { p: [0.92, 2.16, 0], r: [0.58, 0.43] }, { p: [1.17, 2.52, 0], r: [0.5, 0.38] }, { p: [1.4, 2.9, 0], r: [0.4, 0.31] },
+    { p: [1.62, 3.15 + dy * 0.5, 0], r: [0.32, 0.25] }, { p: [1.84, 3.24 + dy, 0], r: [0.26, 0.21] }, { p: [2.08, 3.12 + dy, 0], r: [0.21, 0.17] },
+    { p: [2.34, 2.9 + dy, 0], r: [0.15, 0.125] }, { p: [2.46, 2.8 + dy, 0], r: [0.08, 0.08] }];
   const curve = loft(B, bronze, spine, pre, { rings: 70, seg: 18 });
   // crest mane: a flattened ribbon riding the neck's upper-back edge
   const mane = []; for (let i = 0; i <= 8; i++) { const t = 0.5 + i * 0.055, c = curve.getPoint(t), T = curve.getTangent(t), f = t * (spine.length - 1), k = Math.min(spine.length - 2, Math.floor(f)), ry = spine[k].r[0];
@@ -184,11 +146,11 @@ function horse(B, M, pre, o = {}) {
   // legs: thick muscle at the top, slim cannon, fetlock, pastern and a flared hoof
   const leg = (pts, z) => {
     loft(B, bronze, pts.map(([x, y, r]) => ({ p: [x, y, z], r })), pre, { rings: 28, seg: 10 });
-    const h = pts[pts.length - 1]; B.add(new THREE.CylinderGeometry(0.115, 0.14, 0.14, 10), dark, pre.clone().multiply(new THREE.Matrix4().makeTranslation(h[0], h[1] + 0.05, z)));
+    const h = pts[pts.length - 1]; B.add(new THREE.CylinderGeometry(0.135, 0.16, 0.14, 10), dark, pre.clone().multiply(new THREE.Matrix4().makeTranslation(h[0], h[1] + 0.05, z)));
   };
-  const fore = [[0.82, 2.05, 0.26], [0.85, 1.55, 0.17], [0.87, 1.05, 0.115], [0.87, 0.6, 0.078], [0.88, 0.24, 0.09], [0.92, 0.12, 0.085], [0.95, 0.04, 0.105]];
-  const lifted = [[0.82, 2.05, 0.26], [0.96, 1.62, 0.17], [1.22, 1.35, 0.115], [1.2, 0.98, 0.078], [1.1, 0.72, 0.09], [1.16, 0.62, 0.085], [1.24, 0.56, 0.105]];
-  const hind = [[-0.9, 2.12, 0.32], [-0.7, 1.6, 0.21], [-0.9, 1.15, 0.14], [-1.02, 0.82, 0.105], [-0.98, 0.46, 0.075], [-0.94, 0.2, 0.09], [-0.92, 0.05, 0.105]];
+  const fore = [[0.82, 2.05, 0.31], [0.85, 1.55, 0.21], [0.87, 1.05, 0.135], [0.87, 0.6, 0.095], [0.88, 0.24, 0.11], [0.92, 0.12, 0.1], [0.95, 0.04, 0.12]];
+  const lifted = [[0.82, 2.05, 0.31], [0.96, 1.62, 0.21], [1.22, 1.35, 0.135], [1.2, 0.98, 0.095], [1.1, 0.72, 0.11], [1.16, 0.62, 0.1], [1.24, 0.56, 0.12]];
+  const hind = [[-0.9, 2.12, 0.37], [-0.7, 1.6, 0.26], [-0.9, 1.15, 0.18], [-1.02, 0.82, 0.13], [-0.98, 0.46, 0.095], [-0.94, 0.2, 0.11], [-0.92, 0.05, 0.12]];
   leg(fore, 0.27); leg(raise ? lifted : fore, -0.27); leg(hind, 0.3); leg(hind, -0.3);
   // tail: a heavy flowing sweep, flattened sideways
   loft(B, dark, [{ p: [-1.25, 2.3, 0], r: [0.07, 0.07] }, { p: [-1.52, 2.2, 0], r: [0.12, 0.08] }, { p: [-1.72, 1.78, 0], r: [0.16, 0.09] }, { p: [-1.78, 1.2, 0], r: [0.14, 0.07] }, { p: [-1.72, 0.65, 0], r: [0.08, 0.04] }], pre, { rings: 24, seg: 10 });
@@ -229,14 +191,13 @@ export function wellington(g, x, z, s = 1.3) {
   loft(B, verd, [{ p: [-0.22, 2.7, 0], r: [0.3, 0.34] }, { p: [-0.1, 3.05, 0], r: [0.26, 0.35] }, { p: [-0.04, 3.4, 0], r: [0.25, 0.4] }, { p: [-0.02, 3.62, 0], r: [0.2, 0.33] }, { p: [0.0, 3.76, 0], r: [0.1, 0.1] }], S, { rings: 26, seg: 14 });   // coat and torso
   loft(B, verd, [{ p: [-0.3, 2.62, 0], r: [0.12, 0.3] }, { p: [-0.6, 2.28, 0], r: [0.1, 0.34] }, { p: [-0.72, 1.98, 0], r: [0.05, 0.2] }], S, { rings: 14, seg: 12 });   // coat tails hanging behind the saddle
   ell(B, verd, [-0.02, 3.55, 0.4], [0.16, 0.14, 0.15], [0, 0, 0], S, [8, 6]); ell(B, verd, [-0.02, 3.55, -0.4], [0.16, 0.14, 0.15], [0, 0, 0], S, [8, 6]);    // epaulettes
-  ell(B, verd, [0.03, 3.98, 0], [0.19, 0.23, 0.18], [0, 0, 0], S); ell(B, verd, [0.2, 3.92, 0], [0.07, 0.07, 0.07], [0, 0, 0], S, [8, 6]);                       // head, nose
-  ell(B, dark, [0.0, 4.2, 0], [0.2, 0.09, 0.46], [0, 0, 0.12], S);                                                                                           // bicorne
-  for (const sg of [-1, 1]) loft(B, verd, [{ p: [-0.02, 3.52, sg * 0.42], r: 0.12 }, { p: [0.14, 3.2, sg * 0.52], r: 0.1 }, { p: [sg > 0 ? 0.42 : 0.5, sg > 0 ? 3.0 : 3.42, sg * 0.34], r: 0.08 }], S, { rings: 16, seg: 10 });
-  limb(B, dark, V(0.5, 3.42, -0.34), V(1.0, 3.8, -0.34), 0.035, 0.03, 6, S);                                // baton
-  for (const sg of [-1, 1]) limb(B, dark, V(0.42, 3.0, 0.34), V(1.95, 2.7 + 0.0, sg * 0.12), 0.012, 0.012, 4, S);   // reins
+  ell(B, verd, [0.03, 4.0, 0], [0.23, 0.27, 0.21], [0, 0, 0], S); ell(B, verd, [0.24, 3.94, 0], [0.08, 0.08, 0.08], [0, 0, 0], S, [8, 6]);                       // head, nose
+  ell(B, dark, [0.0, 4.27, 0], [0.25, 0.1, 0.5], [0, 0, 0.1], S);                                                                                           // bicorne
+  for (const sg of [-1, 1]) loft(B, verd, [{ p: [-0.02, 3.52, sg * 0.42], r: 0.12 }, { p: [0.14, 3.2, sg * 0.52], r: 0.1 }, { p: [sg > 0 ? 0.42 : 0.95, sg > 0 ? 3.0 : 3.5, sg * 0.34], r: 0.085 }], S, { rings: 16, seg: 10 });
+  ell(B, verd, [0.42, 3.0, 0.34], [0.1, 0.1, 0.1], [0, 0, 0], S, [8, 6]); ell(B, verd, [1.0, 3.5, -0.34], [0.11, 0.1, 0.1], [0, 0, 0], S, [8, 6]);   // hands
   // the cone: orange with two white bands and a square base, as worn by the real statue
-  const cb = 4.26;
-  B.add(sbox(0.62, 0.05, 0.62), orange, S.clone().multiply(new THREE.Matrix4().makeTranslation(0.0, cb, 0)));
+  const cb = 4.36;
+  B.add(new THREE.CylinderGeometry(0.34, 0.34, 0.05, 20), orange, S.clone().multiply(new THREE.Matrix4().makeTranslation(0.0, cb, 0)));
   B.add(new THREE.ConeGeometry(0.27, 0.78, 18), orange, S.clone().multiply(new THREE.Matrix4().makeTranslation(0.0, cb + 0.42, 0)));
   B.add(new THREE.CylinderGeometry(0.19, 0.22, 0.1, 18), white, S.clone().multiply(new THREE.Matrix4().makeTranslation(0.0, cb + 0.27, 0)));
   B.add(new THREE.CylinderGeometry(0.11, 0.14, 0.08, 18), white, S.clone().multiply(new THREE.Matrix4().makeTranslation(0.0, cb + 0.55, 0)));
