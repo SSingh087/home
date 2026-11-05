@@ -96,7 +96,7 @@ function binary(t) {
 // ---- Navigation orbs: bodies on tilted orbits, projected to HTML buttons
 const orbEls = [...document.querySelectorAll('.orb')];
 const orbits = orbEls.map((el, i) => ({
-  el, r: 11 + (i % 3) * 2.4, speed: 0.12 + 0.03 * i, off: (i / orbEls.length) * 6.283,
+  el, r: 11 + (i % 3) * 2.4, speed: 0.045 + 0.012 * i, off: (i / orbEls.length) * 6.283,
   tilt: (i - 2) * 0.09, pos: new THREE.Vector3() }));
 const bodies = orbits.map((o, i) => {
   const m = new THREE.Mesh(new THREE.SphereGeometry(0.35, 24, 24),
@@ -105,10 +105,27 @@ const bodies = orbits.map((o, i) => {
   return m;
 });
 const hovered = new Set();
+const hoverOn = i => () => hovered.add(i), hoverOff = i => () => hovered.delete(i);
 orbEls.forEach((el, i) => {
-  el.addEventListener('pointerenter', () => hovered.add(i));
-  el.addEventListener('pointerleave', () => hovered.delete(i));
+  el.addEventListener('pointerenter', hoverOn(i));
+  el.addEventListener('pointerleave', hoverOff(i));
 });
+// sidebar links only highlight their planet; they never pause the simulation
+const highlighted = new Set();
+document.querySelectorAll('#sidebar a').forEach((el, i) => {
+  const on = () => highlighted.add(i), off = () => highlighted.delete(i);
+  el.addEventListener('pointerenter', on); el.addEventListener('pointerleave', off);
+  el.addEventListener('focus', on); el.addEventListener('blur', off);
+});
+const toggle = document.getElementById('toggle-labels');
+const setLabels = off => {
+  document.body.classList.toggle('labels-off', off);
+  toggle.setAttribute('aria-pressed', off);
+  toggle.textContent = off ? 'Show floating labels' : 'Hide floating labels';
+  try { localStorage.setItem('labelsOff', off ? '1' : ''); } catch {}
+};
+toggle.addEventListener('click', () => setLabels(!document.body.classList.contains('labels-off')));
+try { if (localStorage.getItem('labelsOff')) setLabels(true); } catch {}
 
 function resize() {
   const w = innerWidth, h = innerHeight;
@@ -122,12 +139,17 @@ resize();
 
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (reduce) controls.autoRotate = false;
+let simT = 0;
 const v = new THREE.Vector3(), clock = new THREE.Clock();
 const gp = gridGeo.attributes.position;
 
 function frame() {
-  const dt = Math.min(clock.getDelta(), 0.05);
-  const t = clock.elapsedTime * (reduce ? 0.3 : 1);
+  // Scene time: advances only while no floating label is hovered, so pointing at a planet label
+  // pauses planets, the inspiral/merger, waves and dust together.
+  const rawDt = Math.min(clock.getDelta(), 0.05);
+  const dt = hovered.size === 0 ? rawDt : 0;
+  simT += dt * (reduce ? 0.3 : 1);
+  const t = simT, orbitT = simT;
   const b = binary(t);
   phase += b.omega * dt;
 
@@ -174,11 +196,11 @@ function frame() {
 
   // nav orbs
   orbits.forEach((o, i) => {
-    const a = o.off + t * o.speed;
+    const a = o.off + orbitT * o.speed;
     o.pos.set(Math.cos(a) * o.r, Math.sin(a * 1.3) * 0.8 + Math.sin(o.tilt * 6) , Math.sin(a) * o.r);
     o.pos.applyAxisAngle(new THREE.Vector3(1, 0, 0), o.tilt);
     bodies[i].position.copy(o.pos);
-    bodies[i].scale.setScalar(hovered.has(i) ? 1.8 : 1);
+    bodies[i].scale.setScalar(hovered.has(i) || highlighted.has(i) ? 1.8 : 1);
     v.copy(o.pos).project(camera);
     const sx = (v.x * 0.5 + 0.5) * innerWidth, sy = (-v.y * 0.5 + 0.5) * innerHeight;
     const behind = v.z > 1;

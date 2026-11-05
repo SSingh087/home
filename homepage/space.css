@@ -34,3 +34,19 @@ body.live .orb { position: fixed; left: 0; top: 0; }
 .pal-card ul { list-style: none; margin: 0; padding: 6px; }
 .pal-card li { padding: 10px 12px; border-radius: 8px; color: #fff; cursor: pointer; font: 400 15px 'Outfit', sans-serif; }
 .pal-card li.on, .pal-card li:hover { background: rgba(255, 194, 71, 0.2); }
+
+/* Static sidebar: the same links without chasing a moving target */
+.sidebar { position: fixed; right: 2vw; top: 50%; transform: translateY(-50%); z-index: 6;
+           display: flex; flex-direction: column; gap: .15rem; padding: .6rem; min-width: 9.5rem;
+           background: rgba(20,12,44,.55); border: 1px solid rgba(255,255,255,.12); border-radius: 14px; backdrop-filter: blur(10px); }
+.sidebar a, .sidebar button { display: block; padding: .4rem .7rem; border-radius: 8px; border: 0; background: none; text-align: left;
+           color: rgba(255,255,255,.8); text-decoration: none; font: 400 .85rem 'Space Grotesk', sans-serif; cursor: pointer; }
+.sidebar a:hover, .sidebar a:focus-visible { background: rgba(255,170,40,.22); color: #fff; outline: none; }
+.sidebar button { margin-top: .4rem; border-top: 1px solid rgba(255,255,255,.12); border-radius: 0 0 8px 8px; font-size: .7rem; color: rgba(255,255,255,.45); }
+.sidebar button:hover, .sidebar button:focus-visible { color: var(--gold); outline: none; }
+body.labels-off .orb { display: none; }
+@media (max-width: 600px) {
+  .sidebar { top: auto; bottom: 0; left: 0; right: 0; transform: none; flex-direction: row; flex-wrap: wrap; justify-content: center; border-radius: 14px 14px 0 0; min-width: 0; }
+  .sidebar button { display: none; }
+  .links { display: none; }
+}

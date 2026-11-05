@@ -26,14 +26,25 @@
     <p class="sub">Two black holes are spiralling in. Pick a world to visit, or wait long enough to see what happens when they merge.</p>
   </header>
 
-  <nav id="orbs" aria-label="Sections">
-    <a class="orb" data-orbit="0" href="./research/index.html">Research</a>
-    <a class="orb" data-orbit="1" href="./publications/index.html">Publications</a>
-    <a class="orb" data-orbit="2" href="./timeline/index.html">Timeline</a>
-    <a class="orb" data-orbit="3" href="./nonac/index.html">Beyond academia</a>
-    <a class="orb" data-orbit="5" href="./explorer/index.html">Education</a>
-    <a class="orb" data-orbit="6" href="./experience/index.html">Experience</a>
-    <a class="orb" data-orbit="4" href="./CV.pdf">CV</a>
+  <nav id="orbs" aria-hidden="true">
+    <a class="orb" tabindex="-1" data-orbit="0" href="./research/index.html">Research</a>
+    <a class="orb" tabindex="-1" data-orbit="1" href="./publications/index.html">Publications</a>
+    <a class="orb" tabindex="-1" data-orbit="2" href="./timeline/index.html">Timeline</a>
+    <a class="orb" tabindex="-1" data-orbit="3" href="./nonac/index.html">Beyond academia</a>
+    <a class="orb" tabindex="-1" data-orbit="5" href="./explorer/index.html">Education</a>
+    <a class="orb" tabindex="-1" data-orbit="6" href="./experience/index.html">Experience</a>
+    <a class="orb" tabindex="-1" data-orbit="4" href="./CV.pdf">CV</a>
+  </nav>
+
+  <nav class="sidebar" id="sidebar" aria-label="Sections">
+    <a href="./research/index.html">Research</a>
+    <a href="./publications/index.html">Publications</a>
+    <a href="./timeline/index.html">Timeline</a>
+    <a href="./nonac/index.html">Beyond academia</a>
+    <a href="./explorer/index.html">Education</a>
+    <a href="./experience/index.html">Experience</a>
+    <a href="./CV.pdf">CV</a>
+    <button type="button" id="toggle-labels" aria-pressed="false">Hide floating labels</button>
   </nav>
 
   <footer class="links">
