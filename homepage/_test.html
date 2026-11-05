@@ -1,0 +1,25 @@
+<!DOCTYPE html><html><body style="margin:0"><canvas id="c" width="1400" height="900"></canvas>
+<script type="importmap">{"imports":{"three":"./vendor/three/build/three.module.js","three/addons/":"./vendor/three/addons/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import * as B from './world/buildings.js';
+import * as P from './world/props.js';
+const q = new URLSearchParams(location.search);
+const r = new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true,preserveDrawingBuffer:true});
+r.shadowMap.enabled=true; r.shadowMap.type=THREE.PCFSoftShadowMap; r.toneMapping=THREE.ACESFilmicToneMapping; r.toneMappingExposure=1.05;
+const s=new THREE.Scene(); s.background=new THREE.Color(0x9ccbee);
+s.add(new THREE.HemisphereLight(0xdff0ff,0xb9a070,1.1));
+const sun=new THREE.DirectionalLight(0xfff0d0,2.4); sun.position.set(30,55,25); sun.castShadow=true; sun.shadow.mapSize.set(2048,2048);
+Object.assign(sun.shadow.camera,{left:-30,right:30,top:30,bottom:-30,near:1,far:160}); s.add(sun);
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(80,80).rotateX(-Math.PI/2),new THREE.MeshStandardMaterial({color:0x9cc65f})); ground.receiveShadow=true; s.add(ground);
+const g=new THREE.Group(); s.add(g); const t0=performance.now();
+try {
+  if (q.get('b')) B[q.get('b')](g,[],{props:false});
+  if (q.get('p')) for (const n of q.get('p').split(',')) { const [name,x=0,z=0]=n.split(':'); P[name](g,+x,+z,[]); }
+} catch(e){ console.error('BUILD',e.message,e.stack.split('\n')[1]); }
+window.buildMs=performance.now()-t0; let n=0; g.traverse(o=>{if(o.isMesh)n++}); window.meshes=n;
+const cam=new THREE.PerspectiveCamera(+(q.get('fov')||28),1400/900,1,400);
+const a=+(q.get('a')||0)*Math.PI/180, d=+(q.get('d')||60), h=+(q.get('h')||14), ty=+(q.get('ty')||8), tx=+(q.get('tx')||0);
+cam.position.set(tx+Math.sin(a)*d,h,Math.cos(a)*d); cam.lookAt(tx,ty,0);
+r.render(s,cam); window.done=true;
+</script></body></html>
