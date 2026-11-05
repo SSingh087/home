@@ -118,26 +118,8 @@ export function observatoire(g, sp, o = {}) {
   return { r: 9, front: 10, h: 14, cols: [...P, { x: 0, z: 0, r: 7.4 }, { x: 0, z: -2, r: 4.2 }] };
 }
 
-// ---------------------------------------------------------------- University of Glasgow
-export function glasgow(g, sp, o = {}) {
-  const red = (cols, rows, rx = 3, ry = 1, tall = true) => wall({ base: '#b8633f', line: 'rgba(60,20,10,.16)', win: '#2c2422', frame: '#e8c9a0', cols, rows, arch: true, tall }, rx, ry);
-  const slate = M(0x3a4150, { roughness: 0.6 });
-  rbox(g, 17, 5, 5, 0, 0, 0, red(8, 2, 2, 1), 0.3);
-  prism(g, 5.6, 2.4, 17.2, 0, 5, 0, slate, true);
-  [-7.2, 7.2].forEach(x => { // gabled end pavilions with pointed turrets
-    rbox(g, 4.6, 7, 6.2, x, 0, 0.5, red(3, 3, 1, 1), 0.3);
-    prism(g, 4.9, 3, 6.4, x, 7, 0.5, slate);
-    [-1, 1].forEach(s => { cyl(g, 0.42, 0.5, 8.4, x + s * 2.2, 0, 3.4, M(0xb8633f), 12); cone(g, 0.62, 2.2, x + s * 2.2, 8.4, 3.4, slate, 12); });
-  });
-  // the tower and spire
-  rbox(g, 3.8, 13, 3.8, 0, 0, -0.3, red(2, 6, 1, 1), 0.3);
-  rbox(g, 4.4, 0.6, 4.4, 0, 12, -0.3, M(0xd9a074), 0.15);
-  [[-1.8, -2.1], [1.8, -2.1], [-1.8, 1.5], [1.8, 1.5]].forEach(([x, z]) => { cyl(g, 0.32, 0.4, 2.4, x, 12.6, z, M(0xb8633f), 10); cone(g, 0.55, 1.8, x, 15, z, slate, 10); });
-  cone(g, 2.1, 7, 0, 12.6, -0.3, slate, 4).rotation.y = Math.PI / 4;
-  rbox(g, 0.12, 2.4, 0.12, 0, 19.4, -0.3, M(0xd8b45a), 0.03);
-  const P = []; if (o.props !== false) { flagpole(g, 'scotland', 9, 6, sp, 7); const w = wellington(g, -10.5, 10); P.push({ x: 9, z: 6, r: 0.5, prop: true }, { x: -10.5, z: 10, r: w.r, prop: true }); }
-  return { r: 10, front: 7.6, h: 23, cols: [...P, { x: 0, z: 0, r: 6.4 }, { x: -7.2, z: 0.5, r: 3.8 }, { x: 7.2, z: 0.5, r: 3.8 }] };
-}
+// University of Glasgow lives in glasgow.js (detailed masonry build)
+export { glasgow } from './glasgow.js';
 
 // ---------------------------------------------------------------- IIT Indore
 export function iitIndore(g, sp, o = {}) {
