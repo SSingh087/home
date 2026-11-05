@@ -59,25 +59,8 @@ const clockFace = () => {
 
 const CREAM = 0xf0dfba, SLATE = 0x4b5563, WHITE = 0xf7f1e6, DARK = 0x2a3038;
 
-// ---------------------------------------------------------------- SVNIT Surat
-export function svnit(g, sp, o = {}) {
-  const terra = wall({ base: '#d98a4e', line: 'rgba(120,60,20,.12)', win: '#5a3422', frame: '#f3e2c0', cols: 6, rows: 2 }, 3, 1);
-  rbox(g, 14, 5, 6, 0, 0, 0, terra, 0.35);
-  rbox(g, 14.5, 0.6, 6.5, 0, 5, 0, M(CREAM), 0.2);
-  rbox(g, 6, 3.4, 4, 0, 5.6, -0.5, wall({ base: '#e0955a', win: '#5a3422', frame: '#f3e2c0', cols: 3, rows: 1 }, 1, 1), 0.3);
-  // taller hostel-style block behind
-  rbox(g, 5, 9, 5, -6.2, 0, -5.5, wall({ base: '#c8643a', line: 'rgba(0,0,0,.1)', win: '#3f2418', frame: '#f3e2c0', cols: 3, rows: 5 }, 1, 1), 0.3);
-  // round white tower with circular openings
-  cyl(g, 2.1, 2.1, 7.4, 6.3, 0, -1.2, M(WHITE));
-  cyl(g, 2.4, 2.4, 0.5, 6.3, 7.4, -1.2, M(0xd9cfbd));
-  for (let i = 0; i < 6; i++) for (let j = 0; j < 2; j++) { const a = -0.9 + i * 0.36 + Math.PI / 2 * 0; ball(g, 0.26, 6.3 + Math.sin(a + 0.6) * 2.12, 2.6 + j * 2.2, -1.2 + Math.cos(a + 0.6) * 2.12, M(0x3a2a22)).scale.set(1, 1, 0.3); }
-  // gate: pointed centre pylon over a banner, as on the campus entrance
-  [-3.6, 3.6].forEach(x => { rbox(g, 1.2, 3.8, 1.2, x, 0, 6.6, M(CREAM), 0.2); cone(g, 0.85, 1.2, x, 3.8, 6.6, M(0xc8643a), 4).rotation.y = Math.PI / 4; });
-  rbox(g, 8.6, 1, 0.6, 0, 3, 6.6, new THREE.MeshStandardMaterial({ map: label('SVNIT SURAT', 8.6, 1, '#1d2f55', '#ffffff'), roughness: 0.7 }), 0.15);
-  cone(g, 1.1, 2.4, 0, 4, 6.6, M(CREAM), 4).rotation.y = Math.PI / 4;
-  const P = []; if (o.props !== false) { const gm = gem(g, -7.5, 6.5, sp); flagpole(g, 'india', 8, 5.5, sp, 6.5); P.push({ x: -7.5, z: 6.5, r: gm.r, prop: true }, { x: 8, z: 5.5, r: 0.5, prop: true }); }
-  return { r: 9, front: 9.8, h: 11, cols: [...P, { x: 0, z: 0, r: 7.5 }, { x: -6.2, z: -5.5, r: 3.8 }, { x: 6.3, z: -1.2, r: 2.6 }, { x: -3.6, z: 6.6, r: 0.9 }, { x: 3.6, z: 6.6, r: 0.9 }] };
-}
+// SVNIT Surat lives in svnit.js (detailed build)
+export { svnit } from './svnit.js';
 
 // Sorbonne chapel lives in sorbonne.js (detailed masonry build)
 export { sorbonne } from './sorbonne.js';
@@ -88,59 +71,8 @@ export { observatoire } from './observatoire.js';
 // University of Glasgow lives in glasgow.js (detailed masonry build)
 export { glasgow } from './glasgow.js';
 
-// ---------------------------------------------------------------- IIT Indore
-export function iitIndore(g, sp, o = {}) {
-  const glass = wall({ base: '#e9ecf1', line: null, win: '#4d8fa8', cols: 5, rows: 3 }, 3, 1);
-  rbox(g, 14, 6, 5.5, 0, 0, -3, glass, 0.35);
-  rbox(g, 14.6, 0.5, 6, 0, 6, -3, M(0xcfd5de), 0.15);
-  [-7.6, 7.6].forEach(x => rbox(g, 4, 4.2, 3.4, x, 0, 3, M(0xdfe3ea), 0.3).material = wall({ base: '#dfe3ea', win: '#4d8fa8', cols: 2, rows: 2 }, 1, 1));
-  // the white winged gateway from the entrance photo, over the blue sign board
-  const white = M(0xffffff, { roughness: 0.4 });
-  rbox(g, 1, 7.4, 1, 0, 0, 4.6, white, 0.12);
-  [-1, 1].forEach(s => {
-    const wing = rbox(g, 6.4, 0.55, 1.6, s * 3.2, 0, 4.6, white, 0.15); wing.position.y = 6.5 + 0.55; wing.rotation.z = s * 0.3;
-    const strut = rbox(g, 5.4, 0.25, 0.25, s * 2.6, 0, 4.6, white, 0.08); strut.position.y = 6.9; strut.rotation.z = -s * 0.28;
-  });
-  rbox(g, 7.6, 2.2, 0.4, 0, 0.6, 5.3, new THREE.MeshStandardMaterial({ map: label('IIT INDORE', 7.6, 2.2, '#1f4fb5', '#e8eef7'), roughness: 0.6 }), 0.12);
-  const P = []; if (o.props !== false) { flagpole(g, 'india', -9, 8, sp, 6.5); P.push({ x: -9, z: 8, r: 0.5, prop: true }); }
-  return { r: 9, front: 8, h: 10, cols: [...P, { x: 0, z: -3, r: 7.2 }, { x: 0, z: 4.6, r: 1 }, { x: -7.6, z: 3, r: 2.4 }, { x: 7.6, z: 3, r: 2.4 }] };
-}
+// IIT Indore lives in iit.js (detailed build)
+export { iitIndore } from './iit.js';
 
-// ---------------------------------------------------------------- Max Planck Institute / AEI Hannover
-export function aei(g, spinners, o = {}) {
-  const glassMat = M(0x8fd6bc, { transparent: true, opacity: 0.78, roughness: 0.2, metalness: 0.1 });
-  const edge = new THREE.LineBasicMaterial({ color: 0x24343a });
-  const gbox = (w, h, d, x, y, z, mat = glassMat) => {
-    const m = rbox(g, w, h, d, x, y, z, mat, 0.12);
-    const e = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(w, h, d)), edge); e.position.copy(m.position); g.add(e);
-    for (let i = 1; i < Math.floor(w / 1.2); i++) { const s = rbox(g, 0.06, h, d + 0.02, -w / 2 + x + i * 1.2, y, z, M(0x6fb89c, { transparent: true, opacity: 0.6 }), 0.01); s.castShadow = false; }
-    return m;
-  };
-  gbox(13, 4.2, 5.4, -1, 0, 0);
-  gbox(8, 3.4, 5, 2.2, 4.2, -0.8);
-  rbox(g, 3, 4.2, 3.4, 8.2, 0, -2.6, M(0xd8344a), 0.3);
-  rbox(g, 5, 0.25, 0.25, 5.2, 3.4, -2.6, M(0x24343a), 0.05);
-  // LISA triangle sculpture: three spacecraft joined by laser arms
-  const L = new THREE.Group(); L.position.set(-1, 11, 0); g.add(L);
-  const pts = [0, 1, 2].map(i => new THREE.Vector3(Math.cos(i * 2.094) * 3.4, 0, Math.sin(i * 2.094) * 3.4));
-  pts.forEach(p => { const m = new THREE.Mesh(new THREE.SphereGeometry(0.55, 16, 12), new THREE.MeshStandardMaterial({ color: 0xffd27a, emissive: 0xffa030, emissiveIntensity: 0.9 })); m.position.copy(p); m.castShadow = true; L.add(m); });
-  [[0, 1], [1, 2], [2, 0]].forEach(([a, b]) => {
-    const d = pts[b].clone().sub(pts[a]), arm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, d.length(), 6), new THREE.MeshBasicMaterial({ color: 0xff5a5a }));
-    arm.position.copy(pts[a]).addScaledVector(d, 0.5); arm.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); L.add(arm);
-  });
-  cyl(g, 0.15, 0.25, 7.6, -1, 4, 0, M(0x6b7380), 8);
-  spinners.push(L);
-  const P = []; if (o.props !== false) { brandenburg(g, -14, 4); flagpole(g, 'germany', 11, 6, spinners, 6.5); P.push({ x: -14, z: 4, r: 4.8, prop: true }, { x: 11, z: 6, r: 0.5, prop: true }); }
-  return { r: 9, front: 7.6, h: 15, cols: [...P, { x: -1, z: 0, r: 6.8 }, { x: 8.2, z: -2.6, r: 2.2 }] };
-}
-
-// ---------------------------------------------------------------- Plaza centrepiece: spinning black hole sculpture
-export function blackHoleSculpture(scene, spinners) {
-  const g = new THREE.Group(); scene.add(g);
-  const base = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.6, 1, 24), M(0xb8ab94)); base.position.y = 0.5; base.castShadow = base.receiveShadow = true; g.add(base);
-  const bh = new THREE.Group(); bh.position.y = 3; g.add(bh);
-  bh.add(new THREE.Mesh(new THREE.SphereGeometry(0.8, 24, 20), new THREE.MeshBasicMaterial({ color: 0x000000 })));
-  const disc = new THREE.Mesh(new THREE.RingGeometry(1.05, 1.9, 48), new THREE.MeshBasicMaterial({ color: 0xffa030, side: THREE.DoubleSide }));
-  disc.rotation.x = Math.PI / 2.2; bh.add(disc); spinners.push(bh);
-  return { r: 1.8 };
-}
+// AEI Hannover and the plaza black-hole sculpture live in aei.js (detailed build)
+export { aei, blackHoleSculpture } from './aei.js';
