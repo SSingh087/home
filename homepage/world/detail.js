@@ -66,7 +66,7 @@ export function materials(o = {}) {
   const trim = stone.clone(); trim.color.set(o.trim ?? 0xf4dcc0);
   const plinth = stone.clone(); plinth.color.set(o.plinth ?? 0xa89480);
   const slate = new THREE.MeshStandardMaterial({ map: sl.map, bumpMap: sl.bump, bumpScale: 1.6, roughness: 0.55, metalness: 0.05 });
-  const glass = new THREE.MeshStandardMaterial({ color: 0x3a4a60, roughness: 0.18, metalness: 0.4, emissive: 0x101a28 });
+  const gt = glassTexture(), glass = new THREE.MeshStandardMaterial({ map: gt, emissiveMap: gt, emissive: 0xffffff, emissiveIntensity: 0.55, color: 0xffffff, roughness: 0.25, metalness: 0.1 });
   const bar = new THREE.MeshStandardMaterial({ color: 0x2a2622, roughness: 0.7 });
   const door = new THREE.MeshStandardMaterial({ color: 0x3a281c, roughness: 0.8 });
   const bronze = new THREE.MeshStandardMaterial({ color: 0x5d5a3a, roughness: 0.5, metalness: 0.45 });
@@ -105,6 +105,22 @@ export function rarch(w, h, oy = 0, hole = false) {
 export function rect(w, h, oy = 0, hole = false) {
   const p = hole ? new THREE.Path() : new THREE.Shape(); p.moveTo(-w / 2, oy); p.lineTo(w / 2, oy); p.lineTo(w / 2, oy + h); p.lineTo(-w / 2, oy + h); p.closePath(); return p;
 }
+// Window glass: lighting-independent baked look (sky reflection fading to a warm interior), so panes
+// stay readable whatever the sun does. UVs are normalised per pane.
+let _glassTex;
+export function glassTexture() {
+  if (_glassTex) return _glassTex;
+  const c = document.createElement('canvas'); c.width = 64; c.height = 128; const k = c.getContext('2d');
+  const gr = k.createLinearGradient(0, 0, 0, 128); gr.addColorStop(0, '#d6eaf8'); gr.addColorStop(0.35, '#8fb3d1'); gr.addColorStop(0.7, '#5d7896'); gr.addColorStop(1, '#6b6a68');
+  k.fillStyle = gr; k.fillRect(0, 0, 64, 128);
+  k.fillStyle = 'rgba(255,255,255,.22)'; k.beginPath(); k.moveTo(0, 20); k.lineTo(64, 0); k.lineTo(64, 36); k.lineTo(0, 70); k.closePath(); k.fill();   // reflected-sky streak
+  _glassTex = new THREE.CanvasTexture(c); _glassTex.colorSpace = THREE.SRGBColorSpace; return _glassTex;
+}
+export const glassExtrude = (shape, depth) => {
+  const g = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false, curveSegments: 8 }); g.computeBoundingBox(); const bb = g.boundingBox, p = g.attributes.position, uv = g.attributes.uv;
+  for (let i = 0; i < uv.count; i++) uv.setXY(i, (p.getX(i) - bb.min.x) / ((bb.max.x - bb.min.x) || 1), (p.getY(i) - bb.min.y) / ((bb.max.y - bb.min.y) || 1));
+  return g;
+};
 export const extrude = (shape, depth) => worldUV(new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false, curveSegments: 8 }));
 
 // collects geometry per material, then merges into one mesh each (hundreds of parts, a handful of draw calls)
@@ -132,7 +148,7 @@ export function parts(B, M) {
     const f = 0.14, outer = arch(w + 2 * f, h + f * 1.6);
     outer.holes.push(arch(w, h, f * 0.5, true));
     B.add(extrude(outer, 0.18), trim, base.clone().multiply(mat4(x, y, 0)));
-    B.add(extrude(arch(w, h, f * 0.5), 0.02), glass, base.clone().multiply(mat4(x, y, 0.01)));
+    B.add(glassExtrude(arch(w, h, f * 0.5), 0.02), glass, base.clone().multiply(mat4(x, y, 0.01)));
     for (let i = 1; i <= mull; i++) bx(bar, 0.035, h * 0.78, 0.05, x - w / 2 + i * w / (mull + 1), y + f * 0.5, 0.03, base);
     if (h > 1.4) bx(bar, w, 0.03, 0.05, x, y + h * 0.58, 0.03, base);
   };
@@ -172,7 +188,7 @@ export function parts(B, M) {
   const swin = (base, x, y, w, h, o = {}) => {
     const f = 0.13, outer = rect(w + 2 * f, h + f * 1.4, 0); outer.holes.push(rect(w, h, f * 0.5, true));
     B.add(extrude(outer, 0.17), o.surround ?? trim, base.clone().multiply(mat4(x, y, 0)));
-    B.add(extrude(rect(w, h, f * 0.5), 0.02), glass, base.clone().multiply(mat4(x, y, 0.01)));
+    B.add(glassExtrude(rect(w, h, f * 0.5), 0.02), glass, base.clone().multiply(mat4(x, y, 0.01)));
     bx(bar, 0.035, h, 0.05, x, y + f * 0.5, 0.03, base); bx(bar, w, 0.03, 0.05, x, y + h * 0.62, 0.03, base);
     bx(trim, w + 0.4, 0.09, 0.3, x, y - 0.07, 0.15, base);
     if (o.pedi) { const s = new THREE.Shape(); s.moveTo(-(w + 0.5) / 2, 0); s.lineTo((w + 0.5) / 2, 0); s.lineTo(0, 0.32); s.closePath();
@@ -182,7 +198,7 @@ export function parts(B, M) {
   const rwin = (base, x, y, w, h, o = {}) => {
     const f = o.f ?? 0.14, outer = rarch(w + 2 * f, h + f * 1.2, 0); outer.holes.push(rarch(w, h, f * 0.5, true));
     B.add(extrude(outer, 0.17), trim, base.clone().multiply(mat4(x, y, 0)));
-    B.add(extrude(rarch(w, h, f * 0.5), 0.02), o.mat ?? glass, base.clone().multiply(mat4(x, y, 0.01)));
+    B.add(glassExtrude(rarch(w, h, f * 0.5), 0.02), o.mat ?? glass, base.clone().multiply(mat4(x, y, 0.01)));
     if (o.bars !== false) { bx(bar, 0.035, h * 0.8, 0.05, x, y + f * 0.5, 0.03, base); bx(bar, w, 0.03, 0.05, x, y + h * 0.55, 0.03, base); }
     bx(trim, f * 1.5, f * 1.4, 0.24, x, y + h + f * 0.2, 0.05, base);                    // keystone
   };
