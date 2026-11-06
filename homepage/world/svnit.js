@@ -143,5 +143,5 @@ export function svnit(g, sp, o = {}) {
   B.flush(g);
 
   const P = []; if (o.props !== false) { const gm = gem(g, -7.5, 6.5, sp); flagpole(g, 'india', 8, 5.5, sp, 6.5); P.push({ x: -7.5, z: 6.5, r: gm.r, prop: true }, { x: 8, z: 5.5, r: 0.5, prop: true }); }
-  return { r: 9, front: 9.8, h: 12, cols: [...P, { x: 0, z: 0, r: 7.5 }, { x: HX, z: HZ, r: 3.8 }, { x: RX, z: RZ, r: 2.6 }, { x: -3.6, z: GZ, r: 0.9 }, { x: 3.6, z: GZ, r: 0.9 }] };
+  return { r: 9, front: 9.8, h: 12, cols: [...P, { x: 6, z: -7, r: 0.6 }, { x: 7, z: 6.5, r: 0.6 }, { x: 8, z: 2.5, r: 0.6 }, { x: -8, z: 2.5, r: 0.6 }, { x: 7, z: -5.5, r: 0.6 }, { x: 4, z: -7.5, r: 0.6 }, { x: 7, z: 4.5, r: 0.6 }, { x: 0, z: 0, r: 7.5 }, { x: HX, z: HZ, r: 3.8 }, { x: RX, z: RZ, r: 2.6 }, { x: -3.6, z: GZ, r: 0.9 }, { x: 3.6, z: GZ, r: 0.9 }] };
 }

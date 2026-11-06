@@ -141,5 +141,5 @@ export function sorbonne(g, sp, o = {}) {
   B.flush(g);
 
   const P = []; if (o.props !== false) { flagpole(g, 'france', 8.5, 6.5, sp, 6); P.push({ x: 8.5, z: 6.5, r: 0.5, prop: true }); }
-  return { r: 9.5, front: 9.2, h: 22, cols: [...P, { x: 0, z: -0.5, r: 8 }, { x: 0, z: 4, r: 3.4 }] };
+  return { r: 9.5, front: 9.2, h: 22, cols: [...P, { x: -7.5, z: 5, r: 0.6 }, { x: 7, z: 5, r: 0.6 }, { x: -6, z: 6, r: 0.6 }, { x: 8, z: 3.5, r: 0.6 }, { x: 0, z: -0.5, r: 8 }, { x: 0, z: 4, r: 3.4 }] };
 }

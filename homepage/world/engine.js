@@ -112,7 +112,7 @@ export async function createWorld(cfg) {
     const bm = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(0.8, 1), M(T.leaf[1]), 60), fm = new THREE.InstancedMesh(new THREE.SphereGeometry(0.22, 8, 6), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6 }), 120);
     let nb = 0, nf = 0; tries = 0; const cols = T.flowers.map(c => new THREE.Color(c));
     while (nb < 60 && tries++ < 3000) { const a = Math.random() * 6.283, d = PLAZA + 2 + Math.random() * (R - PLAZA - 5), x = Math.sin(a) * d, z = Math.cos(a) * d; if (!free(x, z, 1.5)) continue;
-      m.makeScale(1, 0.7, 1).setPosition(x, 0.4, z); bm.setMatrixAt(nb++, m);
+      m.makeScale(1, 0.7, 1).setPosition(x, 0.4, z); bm.setMatrixAt(nb++, m); solid(x, z, 0.9);
       for (let f = 0; f < 2 && nf < 120; f++) { m.makeScale(1, 1, 1).setPosition(x + (Math.random() - 0.5) * 3, 0.25, z + (Math.random() - 0.5) * 3); fm.setMatrixAt(nf, m); fm.setColorAt(nf++, cols[nf % cols.length]); } }
     bm.count = nb; fm.count = nf; bm.castShadow = true; scene.add(bm, fm);
   }
@@ -208,8 +208,11 @@ export async function createWorld(cfg) {
     const k = 1 - Math.exp(-dt * (len > 0 ? 9 : 12));
     player.vx += (tx - player.vx) * k; player.vz += (tz - player.vz) * k;
     const ok = (x, z) => Math.hypot(x, z) < R - 2.5 && !colliders.some(c => Math.hypot(x - c.x, z - c.z) < c.r + 0.8);
-    if (ok(player.x + player.vx * dt, player.z)) player.x += player.vx * dt; else player.vx = 0;
-    if (ok(player.x, player.z + player.vz * dt)) player.z += player.vz * dt; else player.vz = 0;
+    const steps = Math.max(1, Math.ceil(Math.hypot(player.vx, player.vz) * dt / 0.3)), h = dt / steps;   // small sub-steps so fast movement can't skip over thin colliders
+    for (let i = 0; i < steps; i++) {
+      if (ok(player.x + player.vx * h, player.z)) player.x += player.vx * h; else player.vx = 0;
+      if (ok(player.x, player.z + player.vz * h)) player.z += player.vz * h; else player.vz = 0;
+    }
     const speed = Math.hypot(player.vx, player.vz);
     if (speed > 0.6) { let d = Math.atan2(player.vx, player.vz) - player.face; d = Math.atan2(Math.sin(d), Math.cos(d)); player.face += d * Math.min(1, dt * 12); }
     walk += dt * speed * 1.4;
