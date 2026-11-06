@@ -5,7 +5,7 @@ import { buildAstronaut } from './astronaut.js';
 import { eiffel } from './props.js';
 import { PLACES, itemUrl } from '../data/places.js';
 import { M, blackHoleSculpture } from './buildings.js';
-import { makeIsland, makeClouds, makeVegetation } from './nature.js';
+import { makeIsland, makeClouds, makeVegetation, makeSky, plazaMaterial, pathMaterial } from './nature.js';
 
 const R = 40, PLAZA = 6.5, SC_B = 0.7;
 const $ = id => document.getElementById(id);
@@ -19,19 +19,23 @@ export async function createWorld(cfg) {
   renderer.shadowMap.autoUpdate = false;   // the sun never moves: re-render shadows only when a caster moves (see loop)
   renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = T.exposure ?? 1.05;
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(28, 1, 1, 400);
+  const camera = new THREE.PerspectiveCamera(28, 1, 1, 2000);
 
-  // gradient sky
+  // gradient sky (night themes) or a physically-flavoured sky dome with horizon haze (day themes)
   { const c = document.createElement('canvas'); c.width = 4; c.height = 256; const k = c.getContext('2d');
     const gr = k.createLinearGradient(0, 0, 0, 256); T.sky.forEach((col, i) => gr.addColorStop(i / (T.sky.length - 1), col));
     k.fillStyle = gr; k.fillRect(0, 0, 4, 256); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; scene.background = t; }
   scene.fog = new THREE.Fog(T.fog, 90, 220);
 
-  scene.add(new THREE.HemisphereLight(T.hemi[0], T.hemi[1], T.hemi[2]));
-  const sun = new THREE.DirectionalLight(T.sun[0], T.sun[1]);
-  sun.position.set(30, 55, 25); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -0.0005; sun.shadow.normalBias = 0.05;
-  Object.assign(sun.shadow.camera, { left: -55, right: 55, top: 55, bottom: -55, near: 1, far: 160 });
+  scene.add(new THREE.HemisphereLight(T.stars ? T.hemi[0] : 0xa9cdf5, T.stars ? T.hemi[1] : 0x75643f, T.stars ? T.hemi[2] : 1.5));
+  const sun = new THREE.DirectionalLight(T.stars ? T.sun[0] : 0xffefd2, T.stars ? T.sun[1] : 3.1);
+  sun.position.set(30, 55, 25); sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096); sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.04;
+  Object.assign(sun.shadow.camera, { left: -52, right: 52, top: 52, bottom: -52, near: 1, far: 160 });
   scene.add(sun);
+  if (!T.stars) { const fill = new THREE.DirectionalLight(0x9dbfff, 0.55); fill.position.set(-35, 25, -30); scene.add(fill);   // cool sky bounce from the shaded side
+    const haze = makeSky(scene, sun.position); scene.background = null; scene.fog = new THREE.Fog(haze, 110, 300); }
+  { const v = document.createElement('div'); v.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 50% 45%,rgba(0,0,0,0) 55%,rgba(10,20,40,.38) 100%)'; document.body.appendChild(v);
+    canvas.style.filter = 'saturate(1.05) contrast(1.03)'; }
 
   const spinners = [], colliders = [];
   const solid = (x, z, r, prop = false) => colliders.push({ x, z, r, prop });
@@ -49,7 +53,7 @@ export async function createWorld(cfg) {
   const flySeed = Array.from({ length: FLY }, () => [Math.random() * 6.283, 4 + Math.random() * (R - 8), 0.5 + Math.random() * 7, Math.random() * 6.283, 0.2 + Math.random() * 0.5]);
 
   // ---- plaza
-  const plaza = new THREE.Mesh(new THREE.CylinderGeometry(PLAZA, PLAZA + 0.3, 0.3, 48), M(T.plaza)); plaza.position.y = 0.05; plaza.receiveShadow = true; scene.add(plaza);
+  const plaza = new THREE.Mesh(new THREE.CylinderGeometry(PLAZA, PLAZA + 0.3, 0.3, 48), [M(T.plaza), plazaMaterial(T), M(T.plaza)]); plaza.position.y = 0.05; plaza.receiveShadow = true; scene.add(plaza);
   const ring = new THREE.Mesh(new THREE.RingGeometry(PLAZA - 1.6, PLAZA - 1.2, 48).rotateX(-Math.PI / 2), M(T.path)); ring.position.y = 0.22; scene.add(ring);
   solid(0, 0, blackHoleSculpture(scene, spinners).r);
 
@@ -69,7 +73,7 @@ export async function createWorld(cfg) {
     blob.position.set(x, 0.04, z); scene.add(blob);
     // path from plaza to the pad
     const pad = toWorld(0, info.front), len = Math.hypot(pad.x, pad.z) - PLAZA + 0.8;
-    const path = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.12, len), M(T.path)); path.receiveShadow = true;
+    const path = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.12, len), pathMaterial(T, len)); path.receiveShadow = true;
     const dir = new THREE.Vector3(pad.x, 0, pad.z).normalize(), mid = dir.clone().multiplyScalar(PLAZA - 0.8 + len / 2);
     path.position.set(mid.x, 0.07, mid.z); path.rotation.y = Math.atan2(dir.x, dir.z); scene.add(path);
     // glowing pad
