@@ -121,5 +121,5 @@ export function observatoire(g, sp, o = {}) {
   B.flush(g);
 
   const P = []; if (o.props !== false) { flagpole(g, 'france', -8, 8.8, sp, 6); P.push({ x: -8, z: 8.8, r: 0.5, prop: true }); }
-  return { r: 9, front: 10, h: 17, cols: [...P, { x: 0, z: 0, r: 7.4 }, { x: 0, z: -2, r: 4.2 }, { x: SX, z: SZ, r: 0.9, prop: true }] };
+  return { r: 9, front: 10, h: 17, cols: [...P, { x: -7, z: 6, r: 0.6 }, { x: 6.5, z: 6.5, r: 0.6 }, { x: -7.5, z: -4.5, r: 0.6 }, { x: 7.5, z: -4.5, r: 0.6 }, { x: 7.5, z: 3.5, r: 0.6 }, { x: -8, z: 3, r: 0.6 }, { x: -6, z: 7.5, r: 0.6 }, { x: 3.5, z: 7.5, r: 0.6 }, { x: -8, z: -2.5, r: 0.6 }, { x: 8, z: -2.5, r: 0.6 }, { x: -8, z: 7.5, r: 0.6 }, { x: 8, z: 5.5, r: 0.6 }, { x: 8, z: 7.5, r: 0.6 }, { x: 0, z: 0, r: 7.4 }, { x: 0, z: -2, r: 4.2 }, { x: SX, z: SZ, r: 0.9, prop: true }] };
 }
