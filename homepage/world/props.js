@@ -1,11 +1,35 @@
-// Small landmark props that say where each place is: flags, Eiffel Tower, Brandenburg Gate, a Surat diamond, the coned Duke of Wellington.
+// Landmark props that say where each place is: flags, Eiffel Tower, Brandenburg Gate, a Surat diamond, the coned Duke of Wellington.
+// Built from merged geometry (one mesh per material) with real proportions and detail rather than primitives.
 import * as THREE from 'three';
+import { Batch, I, rng, masonry, sbox, scol, worldUV } from './detail.js';
 
 const std = (c, o = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.7, ...o });
 const put = (g, mesh, x, y, z) => { mesh.position.set(x, y, z); mesh.castShadow = mesh.receiveShadow = true; g.add(mesh); return mesh; };
-const cyl = (g, rt, rb, h, x, y, z, m, seg = 12) => put(g, new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), m), x, y + h / 2, z);
-const box = (g, w, h, d, x, y, z, m) => put(g, new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m), x, y + h / 2, z);
+const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
+const Y = V(0, 1, 0), ONE = V(1, 1, 1);
+const rot = (x, y, z) => new THREE.Quaternion().setFromEuler(new THREE.Euler(x, y, z));
+const place = (x, y, z, ry = 0, s = 1) => new THREE.Matrix4().compose(V(x, y, z), rot(0, ry, 0), V(s, s, s));
 
+// matrix that stands a unit-height shape (centred, along +y) between two points
+const along = (a, b) => {
+  const d = b.clone().sub(a), len = d.length();
+  return { len, m: new THREE.Matrix4().compose(a.clone().add(b).multiplyScalar(0.5), new THREE.Quaternion().setFromUnitVectors(Y, d.clone().divideScalar(len || 1)), ONE) };
+};
+// tapered limb: radius ra at a, rb at b
+const limb = (B, mat, a, b, ra, rb, seg = 8, pre = I) => { const { len, m } = along(a, b); B.add(new THREE.CylinderGeometry(rb, ra, len, seg), mat, pre.clone().multiply(m)); };
+// ellipsoid
+const ell = (B, mat, p, r, e = [0, 0, 0], pre = I, seg = [14, 10]) =>
+  B.add(new THREE.SphereGeometry(1, seg[0], seg[1]), mat, pre.clone().multiply(new THREE.Matrix4().compose(V(...p), rot(...e), V(...r))));
+// fluted column shaft along +y (y from 0 to h)
+const fluted = (r, h, N = 20) => {
+  const s = new THREE.Shape();
+  for (let i = 0; i <= 96; i++) { const a = i / 96 * Math.PI * 2, rr = r * (1 - 0.05 * Math.pow(0.5 - 0.5 * Math.cos(N * a), 1.5)); i ? s.lineTo(Math.cos(a) * rr, Math.sin(a) * rr) : s.moveTo(Math.cos(a) * rr, Math.sin(a) * rr); }
+  return worldUV(new THREE.ExtrudeGeometry(s, { depth: h, bevelEnabled: false, curveSegments: 1 }).rotateX(-Math.PI / 2));
+};
+const tint = (geo, c) => { const n = geo.attributes.position.count, a = new Float32Array(n * 3); for (let i = 0; i < n; i++) a.set([c.r, c.g, c.b], i * 3); geo.setAttribute('color', new THREE.BufferAttribute(a, 3)); return geo; };
+const stoneMat = (o = {}) => { const m = masonry({ courses: [26, 12], widths: [70, 70], darkP: 0.1, seed: 5, ...o }); return new THREE.MeshStandardMaterial({ map: m.map, bumpMap: m.bump, bumpScale: 1.2, roughness: 0.95 }); };
+
+// ================================================================ flags
 const flagTex = kind => {
   const c = document.createElement('canvas'); c.width = 300; c.height = 200; const k = c.getContext('2d');
   if (kind === 'scotland') { k.fillStyle = '#0a5ec2'; k.fillRect(0, 0, 300, 200); k.strokeStyle = '#fff'; k.lineWidth = 30; k.beginPath(); k.moveTo(0, 0); k.lineTo(300, 200); k.moveTo(300, 0); k.lineTo(0, 200); k.stroke(); }
@@ -13,18 +37,36 @@ const flagTex = kind => {
     k.strokeStyle = '#000080'; k.lineWidth = 3; k.beginPath(); k.arc(150, 100, 26, 0, 7); for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6; k.moveTo(150, 100); k.lineTo(150 + Math.cos(a) * 26, 100 + Math.sin(a) * 26); } k.stroke(); }
   if (kind === 'germany') { k.fillStyle = '#111'; k.fillRect(0, 0, 300, 67); k.fillStyle = '#dd0000'; k.fillRect(0, 67, 300, 66); k.fillStyle = '#ffce00'; k.fillRect(0, 133, 300, 67); }
   if (kind === 'france') { k.fillStyle = '#0055a4'; k.fillRect(0, 0, 100, 200); k.fillStyle = '#fff'; k.fillRect(100, 0, 100, 200); k.fillStyle = '#ef4135'; k.fillRect(200, 0, 100, 200); }
+  k.strokeStyle = 'rgba(0,0,0,.25)'; k.lineWidth = 6; k.strokeRect(0, 0, 300, 200);        // stitched hem
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
 };
 
-// waving flag on a pole; `animators` receives a per-frame function
+// waving flag on a stepped-base pole with a finial, pulley, halyard and cleat; `animators` receives a per-frame function
 export function flagpole(g, kind, x, z, animators, h = 7) {
-  cyl(g, 0.09, 0.12, h, x, 0, z, std(0xd8d8e0, { metalness: 0.5 }), 8);
-  put(g, new THREE.Mesh(new THREE.SphereGeometry(0.18, 10, 8), std(0xffd25a, { metalness: 0.6 })), x, h + 0.1, z);
-  const geo = new THREE.PlaneGeometry(3.2, 2.1, 16, 4), base = geo.attributes.position.array.slice();
-  const flag = put(g, new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: flagTex(kind), side: THREE.DoubleSide, roughness: 0.9 })), x + 1.7, h - 1.1, z);
-  animators.push(t => { const p = geo.attributes.position; for (let i = 0; i < p.count; i++) { const bx = base[i * 3] + 1.6; p.setZ(i, Math.sin(bx * 1.6 - t * 4) * 0.22 * (bx / 3.2)); } p.needsUpdate = true; });
+  const steel = std(0xd9dce2, { metalness: 0.55, roughness: 0.35 }), gold = std(0xe3b64a, { metalness: 0.8, roughness: 0.3, emissive: 0x3a2800 }), rope = std(0xe9e2cf, { roughness: 0.9 }), base = stoneMat({ seed: 9 });
+  const B = new Batch(), at = new THREE.Matrix4().makeTranslation(x, 0, z);
+  B.add(sbox(0.8, 0.18, 0.8), base, at.clone().multiply(new THREE.Matrix4().makeTranslation(0, 0.09, 0)));
+  B.add(sbox(0.55, 0.28, 0.55), base, at.clone().multiply(new THREE.Matrix4().makeTranslation(0, 0.32, 0)));
+  B.add(new THREE.CylinderGeometry(0.2, 0.26, 0.18, 12), steel, at.clone().multiply(new THREE.Matrix4().makeTranslation(0, 0.55, 0)));
+  const prof = [[0.12, 0.6], [0.105, h * 0.5], [0.085, h * 0.9], [0.07, h]].map(p => new THREE.Vector2(...p));
+  B.add(new THREE.LatheGeometry(prof, 10), steel, at);                                                      // tapered shaft
+  B.add(new THREE.CylinderGeometry(0.11, 0.11, 0.08, 10), gold, at.clone().multiply(new THREE.Matrix4().makeTranslation(0, h * 0.5, 0)));   // collar
+  B.add(new THREE.SphereGeometry(0.17, 12, 10), gold, at.clone().multiply(new THREE.Matrix4().makeTranslation(0, h + 0.1, 0)));            // truck
+  B.add(new THREE.ConeGeometry(0.05, 0.4, 8), gold, at.clone().multiply(new THREE.Matrix4().makeTranslation(0, h + 0.4, 0)));             // spear finial
+  B.add(new THREE.TorusGeometry(0.06, 0.018, 6, 12), steel, at.clone().multiply(new THREE.Matrix4().compose(V(0.12, h - 0.15, 0), rot(0, Math.PI / 2, 0), ONE)));   // pulley
+  limb(B, rope, V(0.13, 0.9, 0.02), V(0.13, h - 0.2, 0.02), 0.012, 0.012, 4, at);                         // halyard, two runs
+  limb(B, rope, V(0.16, 0.9, 0.0), V(0.16, h - 0.2, 0.0), 0.012, 0.012, 4, at);
+  B.add(new THREE.BoxGeometry(0.1, 0.05, 0.05), steel, at.clone().multiply(new THREE.Matrix4().makeTranslation(0.17, 1.2, 0.0)));          // cleat
+  B.flush(g);
+  const geo = new THREE.PlaneGeometry(3.2, 2.1, 16, 4), baseP = geo.attributes.position.array.slice();
+  const flag = put(g, new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: flagTex(kind), side: THREE.DoubleSide, roughness: 0.9 })), x + 1.7, h - 1.1, z); flag.castShadow = false;   // waves every frame; would force a shadow refresh
+  for (const dy of [-0.8, 0.8]) put(g, new THREE.Mesh(new THREE.TorusGeometry(0.05, 0.015, 5, 10), steel), x + 0.12, h - 1.1 + dy, z).castShadow = false;     // grommets
+  animators.push(t => { const p = geo.attributes.position; for (let i = 0; i < p.count; i++) { const bx = baseP[i * 3] + 1.6; p.setZ(i, Math.sin(bx * 1.6 - t * 4) * 0.22 * (bx / 3.2)); } p.needsUpdate = true; });
 }
 
+// ================================================================ Eiffel Tower (the original lighter-weight model, kept on purpose)
+const _cyl = (g, rt, rb, h, x, y, z, m, seg = 12) => put(g, new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, seg), m), x, y + h / 2, z);
+const _box = (g, w, h, d, x, y, z, m) => put(g, new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m), x, y + h / 2, z);
 // Eiffel Tower: four legs on the real exponential-taper profile, arches, X-bracing, three platforms and a spire
 export function eiffel(g, x, z, s = 1) {
   const iron = std(0x8a6c52, { roughness: 0.5, metalness: 0.15, emissive: 0x2a1a0c, emissiveIntensity: 0.4 }), light = std(0xb89a78, { roughness: 0.5 });
@@ -53,8 +95,8 @@ export function eiffel(g, x, z, s = 1) {
   }
   // platforms with a thin railing
   [[0.27, 1.0], [0.56, 1.0], [0.8, 1.0]].forEach(([f]) => {
-    const half = w(f) + 0.55; box(t, half * 2, 0.4, half * 2, 0, f * H, 0, light);
-    box(t, half * 2 + 0.2, 0.12, half * 2 + 0.2, 0, f * H + 0.4, 0, iron);
+    const half = w(f) + 0.55; _box(t, half * 2, 0.4, half * 2, 0, f * H, 0, light);
+    _box(t, half * 2 + 0.2, 0.12, half * 2 + 0.2, 0, f * H + 0.4, 0, iron);
   });
   const top = new THREE.Mesh(new THREE.ConeGeometry(0.42, 4.2, 4), iron); top.position.y = H + 1.8; top.rotation.y = Math.PI / 4; top.castShadow = true; t.add(top);
   strut(new THREE.Vector3(0, H + 3.6, 0), new THREE.Vector3(0, H + 5.6, 0), 0.05, light);
@@ -62,50 +104,178 @@ export function eiffel(g, x, z, s = 1) {
   return { r: W0 * s * 1.05 };
 }
 
-// Brandenburg Gate: columns, entablature, attica and a quadriga
-export function brandenburg(g, x, z) {
-  const stone = std(0xe4d9bd), green = std(0x5fa08a, { metalness: 0.4, roughness: 0.4 }), t = new THREE.Group(); t.position.set(x, 0, z); g.add(t);
-  for (let r = 0; r < 2; r++) for (let i = 0; i < 6; i++) cyl(t, 0.42, 0.48, 5.4, -4.6 + i * 1.84, 0.4, r ? -1.6 : 1.6, stone, 14);
-  box(t, 11.2, 0.4, 5, 0, 0, 0, stone); box(t, 11.2, 1.3, 4.6, 0, 5.8, 0, stone); box(t, 11.6, 0.35, 5, 0, 7.1, 0, stone); box(t, 10, 1.1, 4.2, 0, 7.45, 0, stone);
-  box(t, 2.4, 0.5, 1.6, 0, 8.55, 0, green); // chariot
-  [-0.9, -0.3, 0.3, 0.9].forEach(hx => { box(t, 0.4, 1.1, 0.9, hx, 8.6, 1.2, green); put(t, new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 6), green), hx, 9.8, 1.6); });
-  cyl(t, 0.05, 0.05, 1.4, 0, 9.1, -0.4, green, 6);
-  return { r: 6 };
+// ================================================================ smooth lofted bodies (horse, rider)
+// A tube along a Catmull-Rom path with per-point elliptical radii: pts = [{ p: [x,y,z], r: radius | [ry, rz] }]. Shared vertices give smooth normals.
+const loft = (B, mat, pts, pre = I, o = {}) => {
+  const n = pts.length, rings = o.rings ?? Math.max(12, n * 5), seg = o.seg ?? 14, rr = pts.map(q => Array.isArray(q.r) ? q.r : [q.r, q.r]);
+  const curve = new THREE.CatmullRomCurve3(pts.map(q => V(...q.p)), false, 'catmullrom', 0.5);
+  const R = t => { const f = t * (n - 1), i = Math.min(n - 2, Math.floor(f)), u = f - i, w = u * u * (3 - 2 * u); return [0, 1].map(k => rr[i][k] + (rr[i + 1][k] - rr[i][k]) * w); };
+  const pos = [], uv = [], idx = [], Z = V(0, 0, 1), X = V(1, 0, 0);
+  for (let i = 0; i <= rings; i++) {
+    const t = i / rings, c = curve.getPoint(t), T = curve.getTangent(t), [ry, rz] = R(t), ref = Math.abs(T.z) > 0.9 ? X : Z;
+    const N = V().crossVectors(ref, T).normalize(), Bn = V().crossVectors(T, N).normalize();
+    for (let j = 0; j < seg; j++) { const a = j / seg * Math.PI * 2, ca = Math.cos(a) * ry, sa = Math.sin(a) * rz;
+      pos.push(c.x + ca * N.x + sa * Bn.x, c.y + ca * N.y + sa * Bn.y, c.z + ca * N.z + sa * Bn.z); uv.push(j / seg, t); }
+  }
+  for (let i = 0; i < rings; i++) for (let j = 0; j < seg; j++) { const a = i * seg + j, a1 = i * seg + (j + 1) % seg, b = a + seg, b1 = a1 + seg; idx.push(a, a1, b, b, a1, b1); }
+  const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2)); geo.setIndex(idx); geo.computeVertexNormals();
+  B.add(geo, mat, pre); return curve;
+};
+
+// ================================================================ horse (shared by the Wellington statue and the Brandenburg quadriga)
+// Local frame: ground y=0, facing +x, ~3.9 long, withers ~2.7 high. `pre` places it. o.raise lifts the near fore-leg; o.head lifts/lowers the head (0..1).
+function horse(B, M, pre, o = {}) {
+  const { bronze, dark } = M, raise = o.raise ?? false, hu = o.head ?? 0.5, dy = (hu - 0.5) * 0.5;
+  // one continuous body: rump -> croup -> barrel -> chest -> arched neck -> poll -> head -> muzzle
+  const spine = [
+    { p: [-1.3, 2.3, 0], r: [0.12, 0.1] }, { p: [-1.05, 2.32, 0], r: [0.4, 0.33] }, { p: [-0.7, 2.3, 0], r: [0.56, 0.43] }, { p: [-0.1, 2.14, 0], r: [0.63, 0.47] },
+    { p: [0.45, 2.04, 0], r: [0.64, 0.47] }, { p: [0.92, 2.16, 0], r: [0.58, 0.43] }, { p: [1.17, 2.52, 0], r: [0.5, 0.38] }, { p: [1.4, 2.9, 0], r: [0.46, 0.36] },
+    { p: [1.62, 3.15 + dy * 0.5, 0], r: [0.38, 0.3] }, { p: [1.84, 3.24 + dy, 0], r: [0.31, 0.25] }, { p: [2.08, 3.12 + dy, 0], r: [0.26, 0.21] },
+    { p: [2.34, 2.9 + dy, 0], r: [0.19, 0.155] }, { p: [2.48, 2.8 + dy, 0], r: [0.1, 0.1] }];
+  const curve = loft(B, bronze, spine, pre, { rings: 70, seg: 18 });
+  // crest mane: a flattened ribbon riding the neck's upper-back edge
+  const mane = []; for (let i = 0; i <= 8; i++) { const t = 0.5 + i * 0.055, c = curve.getPoint(t), T = curve.getTangent(t), f = t * (spine.length - 1), k = Math.min(spine.length - 2, Math.floor(f)), ry = spine[k].r[0];
+    mane.push({ p: [c.x - T.y * ry * 0.95, c.y + T.x * ry * 0.95, 0], r: [0.07 - i * 0.004, 0.035] }); }
+  loft(B, dark, mane, pre, { rings: 20, seg: 8 });
+  const head = spine[9].p, ex = spine[10].p;
+  for (const sg of [-1, 1]) {
+    B.add(new THREE.ConeGeometry(0.05, 0.26, 6), bronze, pre.clone().multiply(new THREE.Matrix4().compose(V(head[0] - 0.05, head[1] + 0.22, sg * 0.09), rot(0, 0, -0.1), ONE)));   // ears
+    ell(B, dark, [ex[0] - 0.12, ex[1] + 0.07, sg * 0.125], [0.03, 0.03, 0.025], [0, 0, 0], pre, [6, 5]);                                                                      // eyes
+    ell(B, dark, [spine[12].p[0] - 0.02, spine[12].p[1] + 0.03, sg * 0.04], [0.035, 0.03, 0.03], [0, 0, 0], pre, [6, 5]);                                                     // nostrils
+  }
+  // legs: thick muscle at the top, slim cannon, fetlock, pastern and a flared hoof
+  const leg = (pts, z) => {
+    loft(B, bronze, pts.map(([x, y, r]) => ({ p: [x, y, z], r })), pre, { rings: 28, seg: 10 });
+    const h = pts[pts.length - 1]; B.add(new THREE.CylinderGeometry(0.135, 0.16, 0.14, 10), dark, pre.clone().multiply(new THREE.Matrix4().makeTranslation(h[0], h[1] + 0.05, z)));
+  };
+  const fore = [[0.82, 2.0, 0.2], [0.85, 1.55, 0.26], [0.87, 1.05, 0.16], [0.87, 0.6, 0.095], [0.88, 0.24, 0.11], [0.92, 0.12, 0.1], [0.95, 0.04, 0.12]];
+  const lifted = [[0.82, 2.0, 0.2], [0.96, 1.62, 0.26], [1.22, 1.35, 0.16], [1.2, 0.98, 0.095], [1.1, 0.72, 0.11], [1.16, 0.62, 0.1], [1.24, 0.56, 0.12]];
+  const hind = [[-0.85, 2.0, 0.22], [-0.7, 1.6, 0.31], [-0.9, 1.15, 0.2], [-1.02, 0.82, 0.13], [-0.98, 0.46, 0.095], [-0.94, 0.2, 0.11], [-0.92, 0.05, 0.12]];
+  leg(fore, 0.27); leg(raise ? lifted : fore, -0.27); leg(hind, 0.3); leg(hind, -0.3);
+  for (const sg of [-1, 1]) { ell(B, bronze, [-0.82, 1.98, sg * 0.3], [0.4, 0.5, 0.28], [0, 0, 0.2], pre, [16, 12]); ell(B, bronze, [0.82, 2.0, sg * 0.27], [0.3, 0.4, 0.24], [0, 0, -0.1], pre, [16, 12]); }   // haunches and shoulders hide the leg tops
+  // tail: a heavy flowing sweep, flattened sideways
+  loft(B, dark, [{ p: [-1.25, 2.3, 0], r: [0.07, 0.07] }, { p: [-1.52, 2.2, 0], r: [0.12, 0.08] }, { p: [-1.72, 1.78, 0], r: [0.16, 0.09] }, { p: [-1.78, 1.2, 0], r: [0.14, 0.07] }, { p: [-1.72, 0.65, 0], r: [0.08, 0.04] }], pre, { rings: 24, seg: 10 });
 }
 
-// Surat, the diamond city: a floating gem on a plinth
+// ================================================================ Duke of Wellington (Glasgow), with the traditional traffic cone
+export function wellington(g, x, z, s = 1.3) {
+  const verd = std(0x4f8a72, { roughness: 0.42, metalness: 0.4 }), dark = std(0x2f4f42, { roughness: 0.5, metalness: 0.35 }), stone = stoneMat({ light: ['#d3c7aa', '#cbbe9f', '#dacfb3'], dark: ['#b2a283'], mortar: '#a39673' });
+  const orange = std(0xff6a00, { emissive: 0xff4a00, emissiveIntensity: 0.5 }), white = std(0xffffff, { emissive: 0xaaaaaa, emissiveIntensity: 0.4 });
+  const t = new THREE.Group(); t.position.set(x, 0, z); t.rotation.y = 0.5; t.scale.setScalar(s); g.add(t);
+  const B = new Batch(), Y0 = 2.86, S = new THREE.Matrix4().makeTranslation(0, Y0, 0), M = { bronze: verd, dark };
+  const bx = (w, h, d, px, py, pz) => B.add(sbox(w, h, d), stone, new THREE.Matrix4().makeTranslation(px, py + h / 2, pz));
+  // carved plinth: steps, die with panels, dentil cornice and cap
+  bx(3.9, 0.28, 2.5, 0, 0, 0); bx(3.5, 0.26, 2.1, 0, 0.28, 0); bx(3.0, 1.9, 1.65, 0, 0.54, 0);
+  bx(3.35, 0.2, 1.95, 0, 2.44, 0); bx(3.55, 0.22, 2.15, 0, 2.64, 0);
+  for (let i = 0; i < 12; i++) { const px = -1.55 + i * 0.28; bx(0.12, 0.12, 0.1, px, 2.32, 0.88); bx(0.12, 0.12, 0.1, px, 2.32, -0.88); }
+  for (let i = 0; i < 6; i++) { const pz = -0.75 + i * 0.3; bx(0.1, 0.12, 0.12, 1.55, 2.32, pz); bx(0.1, 0.12, 0.12, -1.55, 2.32, pz); }
+  for (const sg of [-1, 1]) {                                            // raised panel frames
+    for (const [w, h, d, px, py, pz] of [[1.5, 0.08, 0.06, 0, 1.92, sg * 0.84], [1.5, 0.08, 0.06, 0, 1.08, sg * 0.84], [0.08, 0.92, 0.06, 0.71, 1.0, sg * 0.84], [0.08, 0.92, 0.06, -0.71, 1.0, sg * 0.84]]) bx(w, h, d, px, py, pz);
+    bx(0.05, 0.72, 1.3, sg * 1.52, 1.1, 0);
+  }
+  const c = document.createElement('canvas'); c.width = 256; c.height = 128; const k = c.getContext('2d');
+  k.fillStyle = '#4e7a64'; k.fillRect(0, 0, 256, 128); k.strokeStyle = '#2a4538'; k.lineWidth = 6; k.strokeRect(5, 5, 246, 118); k.fillStyle = '#d9e8d8'; k.textAlign = 'center'; k.font = '600 24px serif';
+  k.fillText('THE DUKE OF', 128, 52); k.fillText('WELLINGTON', 128, 88);
+  const ptex = new THREE.CanvasTexture(c); ptex.colorSpace = THREE.SRGBColorSpace;
+  put(t, new THREE.Mesh(new THREE.PlaneGeometry(1.3, 0.65), new THREE.MeshStandardMaterial({ map: ptex, roughness: 0.5, metalness: 0.3 })), 0, 1.45, 0.88).castShadow = false;
+  const back = put(t, new THREE.Mesh(new THREE.PlaneGeometry(1.3, 0.65), new THREE.MeshStandardMaterial({ map: ptex, roughness: 0.5, metalness: 0.3 })), 0, 1.45, -0.88); back.rotation.y = Math.PI; back.castShadow = false;
+  horse(B, M, S, { raise: true, head: 0.55 });
+  // saddle, cloth and stirrups
+  ell(B, dark, [0.05, 2.66, 0], [0.5, 0.1, 0.42], [0, 0, 0], S); ell(B, std(0x3d5a4a), [0.05, 2.58, 0], [0.56, 0.12, 0.5], [0, 0, 0], S);
+  for (const sg of [-1, 1]) { limb(B, dark, V(0.25, 2.45, sg * 0.45), V(0.3, 1.85, sg * 0.52), 0.02, 0.02, 5, S); B.add(new THREE.TorusGeometry(0.1, 0.025, 5, 12), dark, S.clone().multiply(new THREE.Matrix4().compose(V(0.3, 1.75, sg * 0.52), rot(0, Math.PI / 2, 0), ONE))); }
+  const R = S.clone().multiply(new THREE.Matrix4().makeTranslation(0, 2.7, 0)).multiply(new THREE.Matrix4().makeScale(1.2, 1.2, 1.2)).multiply(new THREE.Matrix4().makeTranslation(0, -2.7, 0));   // upper body, a touch heroic
+  // rider: boots, thighs, a smooth tailcoat torso, shoulders, head, bicorne, arms with reins and baton
+  for (const sg of [-1, 1]) {
+    loft(B, verd, [{ p: [-0.05, 2.78, sg * 0.2], r: 0.2 }, { p: [0.4, 2.45, sg * 0.43], r: 0.15 }, { p: [0.34, 1.95, sg * 0.5], r: 0.115 }, { p: [0.36, 1.74, sg * 0.5], r: 0.1 }], S, { rings: 22, seg: 10 });
+    B.add(new THREE.CylinderGeometry(0.105, 0.125, 0.24, 10), dark, S.clone().multiply(new THREE.Matrix4().makeTranslation(0.4, 1.66, sg * 0.5)));       // boot
+    B.add(sbox(0.3, 0.07, 0.17), dark, S.clone().multiply(new THREE.Matrix4().makeTranslation(0.5, 1.54, sg * 0.5)));                                  // boot sole / toe
+  }
+  loft(B, verd, [{ p: [-0.22, 2.7, 0], r: [0.3, 0.34] }, { p: [-0.1, 3.05, 0], r: [0.26, 0.35] }, { p: [-0.04, 3.4, 0], r: [0.25, 0.4] }, { p: [-0.02, 3.62, 0], r: [0.2, 0.33] }, { p: [0.0, 3.76, 0], r: [0.1, 0.1] }], R, { rings: 26, seg: 14 });   // coat and torso
+  for (const sg of [-1, 1]) loft(B, verd, [{ p: [-0.28, 2.66, sg * 0.14], r: 0.17 }, { p: [-0.5, 2.4, sg * 0.18], r: 0.15 }, { p: [-0.58, 2.1, sg * 0.18], r: 0.09 }], S, { rings: 14, seg: 10 });   // coat tails behind the saddle
+  ell(B, verd, [-0.02, 3.55, 0.4], [0.16, 0.14, 0.15], [0, 0, 0], R, [8, 6]); ell(B, verd, [-0.02, 3.55, -0.4], [0.16, 0.14, 0.15], [0, 0, 0], R, [8, 6]);    // epaulettes
+  B.add(new THREE.CylinderGeometry(0.13, 0.16, 0.3, 12), verd, R.clone().multiply(new THREE.Matrix4().makeTranslation(0.0, 3.8, 0)));                      // neck
+  ell(B, verd, [0.03, 4.0, 0], [0.25, 0.29, 0.23], [0, 0, 0], R); ell(B, verd, [0.26, 3.94, 0], [0.08, 0.08, 0.08], [0, 0, 0], R, [8, 6]);                       // head, nose
+  ell(B, dark, [0.0, 4.27, 0], [0.24, 0.11, 0.42], [0, 0, 0.1], R);                                                                                           // bicorne
+  for (const sg of [-1, 1]) loft(B, verd, [{ p: [-0.02, 3.52, sg * 0.42], r: 0.12 }, { p: [0.14, 3.2, sg * 0.52], r: 0.1 }, { p: [sg > 0 ? 0.42 : 0.95, sg > 0 ? 3.0 : 3.5, sg * 0.34], r: 0.085 }], R, { rings: 16, seg: 10 });
+  ell(B, verd, [0.42, 3.0, 0.34], [0.1, 0.1, 0.1], [0, 0, 0], R, [8, 6]); ell(B, verd, [1.0, 3.5, -0.34], [0.11, 0.1, 0.1], [0, 0, 0], R, [8, 6]);   // hands
+  // the cone: orange with two white bands and a square base, as worn by the real statue
+  const cb = 4.36, cs = 0.85, CR = R.clone().multiply(new THREE.Matrix4().makeTranslation(0, cb, 0)).multiply(new THREE.Matrix4().makeScale(cs, cs, cs));
+  B.add(new THREE.CylinderGeometry(0.34, 0.34, 0.05, 20), orange, CR.clone().multiply(new THREE.Matrix4().makeTranslation(0, 0, 0)));
+  B.add(new THREE.ConeGeometry(0.27, 0.78, 18), orange, CR.clone().multiply(new THREE.Matrix4().makeTranslation(0, 0.42, 0)));
+  B.add(new THREE.CylinderGeometry(0.19, 0.22, 0.1, 18), white, CR.clone().multiply(new THREE.Matrix4().makeTranslation(0, 0.27, 0)));
+  B.add(new THREE.CylinderGeometry(0.11, 0.14, 0.08, 18), white, CR.clone().multiply(new THREE.Matrix4().makeTranslation(0, 0.55, 0)));
+  B.flush(t);
+  return { r: 2.4 * s };
+}
+
+// ================================================================ Surat diamond: a brilliant-cut stone on a turned stone pedestal
+function brilliant(R, hc, hp) {
+  const pt = (rad, ang, y) => [Math.cos(ang) * rad, y, Math.sin(ang) * rad], q = Math.PI / 4;
+  const T = [], S = [], G = [], Gh = [], LG = [];
+  for (let k = 0; k < 8; k++) { T.push(pt(0.56 * R, k * q, hc)); S.push(pt(0.8 * R, (k + 0.5) * q, hc * 0.6)); G.push(pt(R, k * q, 0)); Gh.push(pt(R, (k + 0.5) * q, 0)); LG.push(pt(0.6 * R, (k + 0.5) * q, -hp * 0.45)); }
+  const Tc = [0, hc, 0], C = [0, -hp, 0], tris = [];
+  for (let k = 0; k < 8; k++) {
+    const k1 = (k + 1) % 8, km = (k + 7) % 8;
+    tris.push([Tc, T[k], T[k1]], [T[k], T[k1], S[k]],                                   // table, star facets
+      [T[k], S[km], G[k]], [T[k], G[k], S[k]],                                          // bezel kites
+      [S[k], G[k], Gh[k]], [S[k], Gh[k], G[k1]],                                        // upper girdle
+      [G[k], Gh[k], LG[k]], [Gh[k], G[k1], LG[k]],                                      // lower girdle
+      [G[k], LG[km], LG[k]], [LG[km], C, LG[k]]);                                       // pavilion mains
+  }
+  const pos = new Float32Array(tris.length * 9); tris.forEach((t, i) => t.forEach((v, j) => pos.set(v, i * 9 + j * 3)));
+  const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(pos, 3)); geo.computeVertexNormals(); return geo;
+}
 export function gem(g, x, z, spinners) {
-  cyl(g, 1.4, 1.7, 1.2, x, 0, z, std(0xd8cdb4), 16);
-  const grp = new THREE.Group(); grp.position.set(x, 3.6, z); g.add(grp);
-  const mat = new THREE.MeshStandardMaterial({ color: 0x8fe8ff, emissive: 0x2ab8e0, emissiveIntensity: 0.55, roughness: 0.1, metalness: 0.3, flatShading: true });
-  const crown = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.7, 0.8, 8), mat), pav = new THREE.Mesh(new THREE.ConeGeometry(1.7, 2.2, 8), mat);
-  crown.position.y = 0.4; pav.position.y = -1.1; pav.rotation.x = Math.PI; crown.castShadow = pav.castShadow = true; grp.add(crown, pav); spinners.push(grp);
+  const stone = stoneMat({ light: ['#d8cdb4', '#cfc3a8', '#dfd5bc'], mortar: '#a89c80', seed: 14 });
+  const prof = [[1.75, 0], [1.75, 0.22], [1.5, 0.3], [1.5, 0.4], [1.15, 0.55], [1.0, 0.75], [1.0, 1.1], [1.18, 1.25], [1.18, 1.32], [1.42, 1.4], [1.45, 1.55], [0.2, 1.58], [0, 1.58]].map(p => new THREE.Vector2(...p));
+  const lathe = new THREE.LatheGeometry(prof, 28), uv = lathe.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * 2.2, uv.getY(i) * 0.5);
+  put(g, new THREE.Mesh(lathe, stone), x, 0, z);
+  const grp = new THREE.Group(); grp.position.set(x, 3.15, z); g.add(grp);
+  const geo = brilliant(1.35, 0.5, 1.3);
+  const mat = new THREE.MeshStandardMaterial({ color: 0x7fe0fa, emissive: 0x1fa8d8, emissiveIntensity: 0.6, roughness: 0.05, metalness: 0.25, flatShading: true, transparent: true, opacity: 0.93, side: THREE.DoubleSide });
+  const body = new THREE.Mesh(geo, mat); body.castShadow = true; grp.add(body);
+  grp.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo, 1), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 })));
+  spinners.push(grp);
   return { r: 1.8 };
 }
 
-// Glasgow's Duke of Wellington on his horse, wearing the traditional traffic cone. Built large so the silhouette reads from the camera.
-export function wellington(g, x, z, s = 1.3) {
-  const bronze = std(0x5f8a73, { roughness: 0.45, metalness: 0.25 }), stone = std(0xcfc3a6), dark = std(0x486b58, { roughness: 0.5 });
-  const t = new THREE.Group(); t.position.set(x, 0, z); t.rotation.y = 0.5; t.scale.setScalar(s); g.add(t);
-  const cap = (r, len, px, py, pz, rx, rz, m = bronze) => { const c = put(t, new THREE.Mesh(new THREE.CapsuleGeometry(r, len, 4, 10), m), px, py, pz); c.rotation.set(rx, 0, rz); return c; };
-  // stepped plinth
-  box(t, 3.6, 0.45, 2.2, 0, 0, 0, stone); box(t, 3.0, 2.1, 1.7, 0, 0.45, 0, stone); box(t, 3.3, 0.3, 2.0, 0, 2.55, 0, stone);
-  box(t, 1.1, 0.7, 0.06, 0, 1.2, 0.87, dark); // plaque
-  // horse: barrel, neck, head, ears, legs, tail
-  cap(0.62, 1.9, 0, 3.85, 0, 0, Math.PI / 2);
-  cap(0.34, 1.0, 1.35, 4.65, 0, 0, -0.75);
-  cap(0.27, 0.6, 1.95, 5.2, 0, 0, -1.05);
-  [[0.06, 0.1], [-0.06, -0.1]].forEach(([dz]) => cyl(t, 0.05, 0.08, 0.3, 1.78, 5.55, dz * 1.6, bronze, 6));
-  [[1.0, 0.38], [1.0, -0.38], [-0.95, 0.38], [-0.95, -0.38]].forEach(([lx, lz], i) => { const leg = cyl(t, 0.14, 0.1, 1.3, lx, 2.85, lz, bronze, 8); if (i === 0) { leg.rotation.z = 0.5; leg.position.x += 0.25; leg.position.y += 0.1; } });
-  cap(0.12, 0.9, -1.75, 3.65, 0, 0, 0.35);
-  // rider
-  cap(0.34, 0.9, 0.1, 5.1, 0, 0, 0.1);
-  put(t, new THREE.Mesh(new THREE.SphereGeometry(0.3, 12, 10), bronze), 0.12, 5.95, 0);
-  cap(0.1, 0.7, 0.55, 5.25, 0.35, 0.3, -1.0); // raised arm
-  box(t, 0.9, 0.12, 0.5, 0.12, 6.2, 0, dark); // bicorne hat brim
-  // the traffic cone: bright orange with a white band
-  const cone = new THREE.Mesh(new THREE.ConeGeometry(0.42, 1.1, 16), std(0xff6a00, { emissive: 0xff4a00, emissiveIntensity: 0.55 })); put(t, cone, 0.12, 6.9, 0);
-  const band = new THREE.Mesh(new THREE.CylinderGeometry(0.27, 0.32, 0.18, 16), std(0xffffff, { emissive: 0xaaaaaa, emissiveIntensity: 0.4 })); put(t, band, 0.12, 6.85, 0);
-  cyl(t, 0.5, 0.5, 0.08, 0.12, 6.28, 0, std(0xff6a00, { emissive: 0xff4a00, emissiveIntensity: 0.5 }), 16);
-  return { r: 2.4 * s };
+// ================================================================ Brandenburg Gate: Doric colonnade, triglyph frieze, attic reliefs, quadriga
+export function brandenburg(g, x, z) {
+  const stone = stoneMat({ light: ['#e6dbbd', '#dfd3b3', '#ebe1c5'], dark: ['#c9bb98'], mortar: '#b0a37f', seed: 31, courses: [30, 12] }), pale = std(0xf1e8d0, { roughness: 0.9 });
+  const verd = std(0x5fa08a, { metalness: 0.4, roughness: 0.4 }), dark = std(0x3c6a5b, { metalness: 0.4, roughness: 0.45 }), shade = std(0x6f6552, { roughness: 1 });
+  const t = new THREE.Group(); t.position.set(x, 0, z); g.add(t);
+  const B = new Batch(), bx = (m, w, h, d, px, py, pz) => B.add(sbox(w, h, d), m, new THREE.Matrix4().makeTranslation(px, py + h / 2, pz));
+  bx(stone, 12.0, 0.2, 5.4, 0, 0, 0); bx(stone, 11.6, 0.2, 5.0, 0, 0.2, 0);
+  const xs = Array.from({ length: 6 }, (_, i) => -4.6 + i * 1.84), shaft = fluted(0.42, 4.7, 20);
+  for (let i = 1; i < 5; i++) bx(stone, 0.9, 5.3, 3.4, xs[i], 0.4, 0);                         // walls dividing the five passages
+  for (let i = 0; i < 5; i++) bx(shade, 1.0, 0.02, 3.4, (xs[i] + xs[i + 1]) / 2, 0.4, 0);       // shaded roadway
+  for (const zz of [-1.7, 1.7]) for (const cx of xs) {
+    B.add(shaft.clone(), stone, new THREE.Matrix4().makeTranslation(cx, 0.4, zz));
+    B.add(new THREE.LatheGeometry([[0.38, 0], [0.44, 0.06], [0.58, 0.18], [0.6, 0.22]].map(p => new THREE.Vector2(...p)), 16), stone, new THREE.Matrix4().makeTranslation(cx, 5.1, zz));   // echinus
+    bx(stone, 1.3, 0.14, 1.3, cx, 5.32, zz);                                                          // abacus
+  }
+  bx(stone, 11.4, 0.4, 4.9, 0, 5.46, 0);                                                              // architrave
+  bx(stone, 11.4, 0.6, 4.9, 0, 5.86, 0);                                                              // frieze
+  for (const sg of [-1, 1]) for (let i = 0; i < 25; i++) { const tx = -5.5 + i * 0.46; bx(shade, 0.26, 0.5, 0.06, tx, 5.92, sg * 2.47); }   // triglyphs
+  bx(stone, 11.8, 0.28, 5.2, 0, 6.46, 0);                                                             // cornice
+  bx(stone, 10.2, 1.2, 4.3, 0, 6.74, 0);                                                              // attic
+  for (const sg of [-1, 1]) for (let i = 0; i < 5; i++) bx(pale, 1.5, 0.78, 0.06, -4 + i * 2, 6.95, sg * 2.17);   // relief panels
+  bx(stone, 10.6, 0.22, 4.7, 0, 7.94, 0);
+  bx(stone, 2.8, 0.2, 2.8, 0, 8.16, 0.2);
+  // quadriga: chariot, four horses abreast and Victoria with a wreath-topped staff
+  const Q = new THREE.Matrix4();
+  B.add(sbox(2.9, 0.6, 1.5), verd, new THREE.Matrix4().makeTranslation(0, 8.66, -0.55));
+  for (const sg of [-1, 1]) B.add(new THREE.TorusGeometry(0.5, 0.07, 6, 18), verd, new THREE.Matrix4().compose(V(sg * 1.55, 8.86, -0.55), rot(0, Math.PI / 2, 0), ONE));
+  limb(B, verd, V(0, 8.7, -0.2), V(0, 8.7, 1.4), 0.05, 0.05, 6);                                  // pole
+  for (let i = 0; i < 4; i++) horse(B, { bronze: verd, dark }, place(-1.2 + i * 0.8, 8.36, 1.05, -Math.PI / 2, 0.66), { raise: i === 1, head: 0.4 + (i % 2) * 0.25 });
+  B.add(new THREE.ConeGeometry(0.34, 0.95, 10), verd, new THREE.Matrix4().makeTranslation(0, 9.5, -0.5));
+  limb(B, verd, V(0, 9.9, -0.5), V(0, 10.35, -0.5), 0.2, 0.2, 8);
+  ell(B, verd, [0, 10.55, -0.5], [0.14, 0.16, 0.14]);
+  limb(B, verd, V(0.14, 10.25, -0.5), V(0.38, 10.7, -0.45), 0.07, 0.05, 6); limb(B, verd, V(0.38, 10.7, -0.45), V(0.42, 11.15, -0.4), 0.05, 0.04, 6);
+  limb(B, dark, V(0.42, 9.6, -0.4), V(0.42, 11.6, -0.4), 0.03, 0.03, 6);                           // staff
+  B.add(new THREE.TorusGeometry(0.24, 0.04, 6, 14), verd, new THREE.Matrix4().compose(V(0.42, 11.55, -0.4), rot(0, Math.PI / 2, 0), ONE));  // wreath
+  ell(B, dark, [0.42, 11.95, -0.4], [0.1, 0.12, 0.2], [0, 0, 0]);                                  // eagle
+  limb(B, verd, V(-0.14, 10.25, -0.5), V(-0.4, 10.4, -0.5), 0.07, 0.05, 6);
+  B.flush(t);
+  return { r: 6 };
 }

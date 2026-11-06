@@ -110,6 +110,10 @@ orbEls.forEach((el, i) => {
   el.addEventListener('pointerenter', hoverOn(i));
   el.addEventListener('pointerleave', hoverOff(i));
 });
+// hovering the planet itself (not just its label) counts too: track the pointer in screen space
+const ptr = { x: -1e4, y: -1e4 };
+addEventListener('pointermove', e => { ptr.x = e.clientX; ptr.y = e.clientY; });
+document.addEventListener('pointerleave', () => { ptr.x = ptr.y = -1e4; });
 // sidebar links only highlight their planet; they never pause the simulation
 const highlighted = new Set();
 document.querySelectorAll('#sidebar a').forEach((el, i) => {
@@ -200,10 +204,13 @@ function frame() {
     o.pos.set(Math.cos(a) * o.r, Math.sin(a * 1.3) * 0.8 + Math.sin(o.tilt * 6) , Math.sin(a) * o.r);
     o.pos.applyAxisAngle(new THREE.Vector3(1, 0, 0), o.tilt);
     bodies[i].position.copy(o.pos);
-    bodies[i].scale.setScalar(hovered.has(i) || highlighted.has(i) ? 1.8 : 1);
+    bodies[i].scale.setScalar(hovered.has(i) || hovered.has(i + 100) || highlighted.has(i) ? 1.8 : 1);
     v.copy(o.pos).project(camera);
     const sx = (v.x * 0.5 + 0.5) * innerWidth, sy = (-v.y * 0.5 + 0.5) * innerHeight;
     const behind = v.z > 1;
+    // pointer over the planet sphere (radius ~ 16px, scaled with depth) behaves like hovering its label
+    const hit = !behind && Math.hypot(ptr.x - sx, ptr.y - sy) < 16;
+    if (hit) hovered.add(i + 100); else hovered.delete(i + 100);
     const depth = THREE.MathUtils.clamp(1.3 - camera.position.distanceTo(o.pos) / 45, 0.35, 1);
     o.el.style.transform = `translate(${sx}px, ${sy - 28}px) translate(-50%, -100%) scale(${depth.toFixed(3)})`;
     o.el.style.opacity = behind ? 0 : 1;
